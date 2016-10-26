@@ -27,7 +27,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
             /* 1) Make a new Uri object (Replace this with a real image on your device) */
-        Uri imageUri = Uri.parse("content://media/external/images/media/####");
+//        Uri imageUri = Uri.parse("content://media/external/images/media/####");
+        Uri imageUri = Uri.parse("content://media/0/Pictures/cat.jpg");
 
               /* 2) Find the layout's ImageView by ID */
         mEditedImageView = (ImageView) findViewById(R.id.editedImageView);
