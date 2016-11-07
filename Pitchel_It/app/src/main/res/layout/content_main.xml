@@ -11,10 +11,51 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="cs371m.denisely.pitchel_it.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    android:background="@drawable/background">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <Button
+        android:text="TAKE A PHOTO"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:id="@+id/editButton"
+        android:alpha="0.75"
+
+        android:layout_alignBottom="@+id/importPhotoButton"
+        android:layout_centerHorizontal="true" />
+
+    <ImageView
+
+        android:layout_width="420dp"
+        android:layout_height="240dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/logo"
+        android:id="@+id/imageView2"
+        android:layout_marginTop="76dp"
+        android:layout_marginEnd="42dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:alpha="0.75"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:id="@+id/galleryButton"
+        android:text="View Gallery"
+        android:layout_alignBottom="@+id/importPhotoButton"
+        android:layout_alignEnd="@+id/imageView2"
+        android:layout_marginEnd="33dp" />
+
+    <Button
+        android:alpha="0.75"
+        android:text="Import Photo"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="73dp"
+        android:id="@+id/importPhotoButton"
+        android:layout_marginEnd="42dp"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp"
+        android:layout_below="@+id/imageView2"
+        android:layout_toStartOf="@+id/editButton" />
 </RelativeLayout>
