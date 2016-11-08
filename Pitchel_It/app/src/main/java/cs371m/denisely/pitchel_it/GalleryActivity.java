@@ -18,25 +18,28 @@ import java.util.ArrayList;
 public class GalleryActivity extends Activity {
 
 //    ArrayList<String> pictures = new ArrayList<String>();
-    ArrayList<Integer> pictures = new ArrayList<Integer>();
+    ArrayList<Integer> pictures = new ArrayList<>();
     File[] listFile;
 
     RecyclerView recyclerView;
 
     public void onCreate(Bundle savedInstancestate){
         super.onCreate(savedInstancestate);
+        setContentView(R.layout.gallery_page);
+
         Intent intent = getIntent();
 
 //        fetchImages();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplication(), 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
         GalleryAdapter galleryAdapter = new GalleryAdapter(pictures);
         recyclerView.setAdapter(galleryAdapter);
         fetchDummyImages();
+//        fetchImages();
     }
 
 //    public void fetchImages(){

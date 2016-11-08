@@ -18,9 +18,11 @@ import java.util.ArrayList;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
 //    private ArrayList<String> pictures;
-    private ArrayList<Integer> picturesList;
+    private ArrayList<Integer> pictures;
 
-    public GalleryAdapter(ArrayList<Integer> pictures) { this.picturesList = pictures; }
+//    public GalleryAdapter(ArrayList<String> pictures) { this.pictures = pictures; }
+    public GalleryAdapter(ArrayList<Integer> pictures) { this.pictures = pictures; }
+
 
     @Override
     public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -38,7 +40,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     @Override
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
-        int pictureName = picturesList.get(position);
+//        String pictureName = pictures.get(position);
+        int pictureName = pictures.get(position);
 //        Bitmap bitmap = BitmapFactory.decodeFile(pictureName);
 //        holder.thumbnail.setImageBitmap(bitmap);
         holder.thumbnail.setImageResource(pictureName);
@@ -46,7 +49,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     @Override
     public int getItemCount() {
-        return picturesList.size();
+        return pictures.size();
     }
 
     public class GalleryViewHolder extends RecyclerView.ViewHolder {
