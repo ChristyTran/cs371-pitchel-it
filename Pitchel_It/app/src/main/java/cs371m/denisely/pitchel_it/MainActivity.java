@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -21,6 +19,8 @@ import static android.os.Environment.getExternalStorageState;
 
 public class MainActivity extends AppCompatActivity {
 
+    static final int PICK_IMAGE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,11 +28,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        System.out.println("TEST******************************************************************");
-        System.out.println(Environment.getExternalStorageDirectory());
-
-        Button editPhoto = (Button) findViewById(R.id.editButton);
-        editPhoto.setOnClickListener(new View.OnClickListener() {
+        Button takePhoto = (Button) findViewById(R.id.take_photo);
+        takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -43,20 +40,17 @@ public class MainActivity extends AppCompatActivity {
         importPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                        /* 1) Make a new Uri object (Replace this with a real image on your device) */
-//        Uri imageUri = Uri.parse("content://media/external/images/media/####");
-                String filename = "IMG_20161102_134135.jpg";
-                String path =  Environment.getExternalStorageDirectory() + "/DCIM/Camera/" + filename;
-                File f = new File(path);
-                Uri imageUri = Uri.fromFile(f);
+                // http://viralpatel.net/blogs/pick-image-from-galary-android-app/
+                Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                getIntent.setType("image/*");
 
-    /* 2) Create a new Intent */
-                Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
-                        .setData(imageUri)
-                        .build();
+                Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                pickIntent.setType("image/*");
 
-    /* 3) Start the Image Editor with request code 1 */
-                startActivityForResult(imageEditorIntent, 1);
+                Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+                chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+                startActivityForResult(chooserIntent, PICK_IMAGE);
             }
         });
 
@@ -92,6 +86,23 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null){
+            // Just picked image from device gallery
+            /* 1) Get uri of that image */
+            Uri imageUri = data.getData();
+
+             /* 2) Create a new Intent for imageEditor & set picked image*/
+            Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
+                    .setData(imageUri)
+                    .build();
+
+             /* 3) Start the Image Editor with request code 1 */
+            startActivityForResult(imageEditorIntent, 1);
+        }
+    }
+
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = getExternalStorageState();
@@ -110,4 +121,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
 }

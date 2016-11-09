@@ -36,7 +36,7 @@
         android:layout_marginLeft="75dp"
         android:layout_marginRight="75dp"
         android:layout_centerVertical="true"
-        android:layout_toStartOf="@+id/editButton" />
+        android:layout_toStartOf="@+id/take_photo" />
 
     <ImageView
         android:layout_width="280dp"
@@ -53,7 +53,7 @@
         android:textSize="10sp"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:id="@+id/editButton"
+        android:id="@+id/take_photo"
         android:alpha="0.75"
         android:layout_alignBottom="@+id/galleryButton"
         android:layout_toStartOf="@+id/galleryButton"

@@ -18,7 +18,7 @@
         android:text="TAKE A PHOTO"
         android:layout_width="110dp"
         android:layout_height="110dp"
-        android:id="@+id/editButton"
+        android:id="@+id/take_photo"
         android:alpha="0.75"
 
         android:layout_alignBottom="@+id/importPhotoButton"
@@ -57,5 +57,5 @@
         android:layout_marginLeft="75dp"
         android:layout_marginRight="75dp"
         android:layout_below="@+id/imageView2"
-        android:layout_toStartOf="@+id/editButton" />
+        android:layout_toStartOf="@+id/take_photo" />
 </RelativeLayout>
