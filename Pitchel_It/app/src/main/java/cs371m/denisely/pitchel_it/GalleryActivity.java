@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,8 +18,6 @@ import java.util.ArrayList;
 
 public class GalleryActivity extends Activity {
 
-//    ArrayList<String> pictures = new ArrayList<String>();
-    ArrayList<Integer> pictures = new ArrayList<>();
     File[] listFile;
 
     RecyclerView recyclerView;
@@ -29,33 +28,22 @@ public class GalleryActivity extends Activity {
 
         Intent intent = getIntent();
 
-//        fetchImages();
+        fetchImages();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
-        GalleryAdapter galleryAdapter = new GalleryAdapter(pictures);
+        GalleryAdapter galleryAdapter = new GalleryAdapter(listFile);
         recyclerView.setAdapter(galleryAdapter);
-        fetchDummyImages();
-//        fetchImages();
     }
 
-//    public void fetchImages(){
-//        File file = new File(android.os.Environment.getExternalStorageDirectory(), "/DCIM/Pitchel-It");
-//        if (file.isDirectory()){
-//            listFile = file.listFiles();
-//
-//            for (int i = 0; i < listFile.length; i++){
-//                pictures.add(listFile[i].getAbsolutePath());
-//            }
-//        }
-//        System.out.println(pictures.size());
-//    }
-
-    public void fetchDummyImages(){
-        pictures.add(R.drawable.logo);
-        pictures.add(R.drawable.background);
+    public void fetchImages(){
+        File dir = new File(Environment.getExternalStorageDirectory() + "/screen shot/Neko Atsume");
+        if (dir.isDirectory()){
+            listFile = dir.listFiles();
+        }
     }
+
 }

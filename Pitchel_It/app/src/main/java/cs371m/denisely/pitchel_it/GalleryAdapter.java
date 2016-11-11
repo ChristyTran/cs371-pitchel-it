@@ -2,6 +2,7 @@ package cs371m.denisely.pitchel_it;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -17,11 +19,9 @@ import java.util.ArrayList;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
-//    private ArrayList<String> pictures;
-    private ArrayList<Integer> pictures;
+    private File[] files;
 
-//    public GalleryAdapter(ArrayList<String> pictures) { this.pictures = pictures; }
-    public GalleryAdapter(ArrayList<Integer> pictures) { this.pictures = pictures; }
+    public GalleryAdapter(File[] files) { this.files = files; }
 
 
     @Override
@@ -40,16 +40,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
 
     @Override
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
-//        String pictureName = pictures.get(position);
-        int pictureName = pictures.get(position);
-//        Bitmap bitmap = BitmapFactory.decodeFile(pictureName);
-//        holder.thumbnail.setImageBitmap(bitmap);
-        holder.thumbnail.setImageResource(pictureName);
+        File pictureName = files[position];
+        Bitmap bitmap = BitmapFactory.decodeFile(pictureName.getAbsolutePath());
+        holder.thumbnail.setImageBitmap(bitmap);
     }
 
     @Override
     public int getItemCount() {
-        return pictures.size();
+        return files.length;
     }
 
     public class GalleryViewHolder extends RecyclerView.ViewHolder {

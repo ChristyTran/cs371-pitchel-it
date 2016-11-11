@@ -94,8 +94,26 @@ public class MainActivity extends AppCompatActivity {
             Uri imageUri = data.getData();
 
              /* 2) Create a new Intent for imageEditor & set picked image*/
+//            File destination = new File(Environment.getExternalStorageDirectory() + "/Pictures/Pitchel-It");
+//            System.out.println(destination.isDirectory());
+//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
+//                destination.mkdirs();
+//            } else {
+//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
+//            }
+
             Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
                     .setData(imageUri)
+//                    .withOutput(destination)
                     .build();
 
              /* 3) Start the Image Editor with request code 1 */
