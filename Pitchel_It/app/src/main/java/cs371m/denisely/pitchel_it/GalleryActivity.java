@@ -25,7 +25,7 @@ public class GalleryActivity extends Activity {
     public void onCreate(Bundle savedInstancestate){
         super.onCreate(savedInstancestate);
         setContentView(R.layout.gallery_page);
-        
+
         fetchImages();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);

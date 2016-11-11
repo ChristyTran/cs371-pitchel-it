@@ -1,10 +1,13 @@
 package cs371m.denisely.pitchel_it;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.Button;
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import static android.os.Environment.getExternalStorageState;
@@ -22,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 100;
     static final int EDIT_IMAGE_SUCCESS = 200;
+    static final int TAKE_PHOTO = 300;
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
 
@@ -36,7 +41,10 @@ public class MainActivity extends AppCompatActivity {
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+//                destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                cameraIntent.putExtra("photo", destination);
+                startActivityForResult(cameraIntent, TAKE_PHOTO);
             }
         });
 
@@ -112,7 +120,28 @@ public class MainActivity extends AppCompatActivity {
 
              /* 3) Start the Image Editor with request code 1 */
             startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+        } else if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK && data != null){
+//            Bundle myBundle = data.getExtras();
+//            Uri imageUri = myBundle.;
+
+//            Uri imageUri =  (Uri)data.getExtras().get("photo");
+
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+
+            destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
+            Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
+                    .setData(getImageUri(getApplicationContext(), imageBitmap)).withOutput(destination).build();
+            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+
         }
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     /* Checks if external storage is available for read and write */
