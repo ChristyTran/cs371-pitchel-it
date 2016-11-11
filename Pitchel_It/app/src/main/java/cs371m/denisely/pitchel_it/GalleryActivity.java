@@ -41,6 +41,7 @@ public class GalleryActivity extends Activity {
         File dir = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It");
         if (dir.isDirectory()){
             listFile = dir.listFiles();
+            Log.d("files", "List file length in fetchImages(): " + listFile.length);
         }
     }
 

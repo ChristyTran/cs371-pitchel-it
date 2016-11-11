@@ -3,6 +3,7 @@ package cs371m.denisely.pitchel_it;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,12 +11,17 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
+import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -29,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     static final int TAKE_PHOTO = 300;
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
+    File newDestination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +48,25 @@ public class MainActivity extends AppCompatActivity {
         takePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
+                // Getting new file path
+                if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
+                    System.out.println("making directory");
+                    destination.mkdirs();
+                }
+
+                // Setting up destination aka new file name
+                File[] listFiles = destination.listFiles();
+                int num = 0;
+                if (listFiles != null && listFiles.length != 0) {
+                    String[] temp = listFiles[listFiles.length - 1].toString().split("/");
+                    num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
+                }
+                String newPhotoName = "photo-" + num + ".jpg";
+                newDestination = new File(destination.toString(), newPhotoName);
+
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                cameraIntent.putExtra("photo", destination);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newDestination));
+
                 startActivityForResult(cameraIntent, TAKE_PHOTO);
             }
         });
@@ -74,6 +97,31 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //http://stackoverflow.com/questions/32109917/how-to-create-a-horizontal-list-of-pictures-with-title-in-android
+        File[] listFiles = destination.listFiles();
+        if (listFiles != null && listFiles.length > 0) {
+            LinearLayout layout = (LinearLayout) findViewById(R.id.image_container);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            int count = 6;
+            if (listFiles.length < 6) {
+                count = listFiles.length;
+            }
+
+            for (int i = 0; i < count; i++) {
+                layoutParams.setMargins(15, 0, 15, 20);
+                layoutParams.gravity = Gravity.CENTER;
+                ImageView imageView = new ImageView(this);
+                imageView.setAdjustViewBounds(true);
+                Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFiles[i].toString()));
+                imageView.setImageBitmap(myBitmap);
+    //            imageView.setOnClickListener(documentImageListener);
+                imageView.setLayoutParams(layoutParams);
+
+                layout.addView(imageView);
+
+            }
+        }
     }
 
     @Override
@@ -100,42 +148,82 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
-        String base = Environment.getExternalStorageDirectory().toString();
-
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null){
             // Just picked image from device gallery
             /* 1) Get uri of that image */
             Uri imageUri = data.getData();
 
+            System.out.println("Does the folder exist? " + destination.isDirectory());
+            System.out.println(destination);
              /* 2) Create a new Intent for imageEditor & set picked image*/
             if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
                 System.out.println("making directory");
                 destination.mkdirs();
             }
 
+            // Setting up destination aka new file name
+            File[] listFiles = destination.listFiles();
+            int num = 0;
+            if (listFiles != null && listFiles.length != 0) {
+                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
+                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
+            }
+            String newPhotoName = "photo-" + num + ".jpg";
+            newDestination = new File(destination.toString(), newPhotoName);
 
-            destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
             Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
-                    .setData(imageUri).withOutput(destination).build();
+                    .setData(imageUri)
+                    .withOutput(newDestination)
+                    .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
+                    .withOutputSize(MegaPixels.Mp5) // output size
+                    .withOutputQuality(90) // output quality
+                    .build();
 
              /* 3) Start the Image Editor with request code 1 */
             startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
         } else if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK && data != null){
-//            Bundle myBundle = data.getExtras();
-//            Uri imageUri = myBundle.;
+            File dest = new File(newDestination.toString());
+            // Rescan gallery. If image is taken and back is pressed during editing (photo taken
+            // wasn't edited), should still save that taken image to the gallery & device's gallery
+            // http://stackoverflow.com/questions/4144840/how-can-i-refresh-the-gallery-after-i-inserted-an-image-in-android
+            MediaScannerConnection.scanFile(this, // Refresh device's gallery
+                    new String[] { dest.toString() }, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                            Log.d("ExternalStorage", "Scanned " + path + ":");
+                            Log.d("ExternalStorage", "-> uri=" + uri);
+                        }
+                    });
 
-//            Uri imageUri =  (Uri)data.getExtras().get("photo");
+            Uri imageBitmap = Uri.fromFile(newDestination);
 
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
+                System.out.println("making directory");
+                destination.mkdirs();
+            }
 
-            destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
+            // Setting up destination aka new file name
+            File[] listFiles = destination.listFiles();
+            int num = 0;
+            if (listFiles != null && listFiles.length != 0) {
+                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
+                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
+            }
+
             Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
-                    .setData(getImageUri(getApplicationContext(), imageBitmap)).withOutput(destination).build();
-            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+                    .setData(imageBitmap)
+                    .withOutput(dest)
 
+                    .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
+                    .withOutputSize(MegaPixels.Mp5) // output size
+                    .withOutputQuality(90) // output quality
+                    .build();
+
+            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
         }
     }
+
+
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -162,6 +250,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
-
 }

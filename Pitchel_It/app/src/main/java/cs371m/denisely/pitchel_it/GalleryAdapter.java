@@ -1,5 +1,6 @@
 package cs371m.denisely.pitchel_it;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
     private File[] files;
+    public static int maxW = 500;
+    public static int maxH = 500;
 
     public GalleryAdapter(File[] files) { this.files = files; }
 
@@ -41,12 +44,39 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     @Override
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
         File pictureName = files[position];
-        Bitmap bitmap = BitmapFactory.decodeFile(pictureName.getAbsolutePath());
+        Bitmap bitmap = scaleBitmapAndKeepRatio( BitmapFactory.decodeFile(pictureName.toString()));
         holder.thumbnail.setImageBitmap(bitmap);
+    }
+
+    public static Bitmap scaleBitmapAndKeepRatio(Bitmap bitmap) {
+        Bitmap resizedBitmap = null;
+        int originalWidth = bitmap.getWidth();
+        int originalHeight = bitmap.getHeight();
+        int newWidth = -1;
+        int newHeight = -1;
+        float multFactor = -1.0F;
+        if(originalHeight > originalWidth) {
+            newHeight = maxH;
+            multFactor = (float) originalWidth/(float) originalHeight;
+            newWidth = (int) (newHeight*multFactor);
+        } else if(originalWidth > originalHeight) {
+            newWidth = maxW;
+            multFactor = (float) originalHeight/ (float)originalWidth;
+            newHeight = (int) (newWidth*multFactor);
+        } else {
+            // originalHeight==originalWidth
+            newHeight = maxH;
+            newWidth = maxW;
+        }
+        resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+        return resizedBitmap;
     }
 
     @Override
     public int getItemCount() {
+        if (files == null){
+            return 0;
+        }
         return files.length;
     }
 
