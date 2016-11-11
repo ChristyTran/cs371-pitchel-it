@@ -25,9 +25,7 @@ public class GalleryActivity extends Activity {
     public void onCreate(Bundle savedInstancestate){
         super.onCreate(savedInstancestate);
         setContentView(R.layout.gallery_page);
-
-        Intent intent = getIntent();
-
+        
         fetchImages();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -40,7 +38,7 @@ public class GalleryActivity extends Activity {
     }
 
     public void fetchImages(){
-        File dir = new File(Environment.getExternalStorageDirectory() + "/screen shot/Neko Atsume");
+        File dir = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It");
         if (dir.isDirectory()){
             listFile = dir.listFiles();
         }

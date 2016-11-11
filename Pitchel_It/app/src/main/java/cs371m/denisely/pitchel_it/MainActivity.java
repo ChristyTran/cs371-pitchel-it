@@ -1,6 +1,7 @@
 package cs371m.denisely.pitchel_it;
 
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,6 +21,9 @@ import static android.os.Environment.getExternalStorageState;
 public class MainActivity extends AppCompatActivity {
 
     static final int PICK_IMAGE = 100;
+    static final int EDIT_IMAGE_SUCCESS = 200;
+
+    File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,36 +92,26 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
+        String base = Environment.getExternalStorageDirectory().toString();
+
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null){
             // Just picked image from device gallery
             /* 1) Get uri of that image */
             Uri imageUri = data.getData();
 
              /* 2) Create a new Intent for imageEditor & set picked image*/
-//            File destination = new File(Environment.getExternalStorageDirectory() + "/Pictures/Pitchel-It");
-//            System.out.println(destination.isDirectory());
-//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
-//                destination.mkdirs();
-//            } else {
-//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//                System.out.println("TRUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU");
-//            }
+            if (!destination.isDirectory()){ // If the Pitchel-It folder isn't there yet, create it
+                System.out.println("making directory");
+                destination.mkdirs();
+            }
 
+
+            destination = new File(destination.toString(), "photo-" + destination.listFiles().length + ".jpg");
             Intent imageEditorIntent = new AdobeImageIntent.Builder(MainActivity.this)
-                    .setData(imageUri)
-//                    .withOutput(destination)
-                    .build();
+                    .setData(imageUri).withOutput(destination).build();
 
              /* 3) Start the Image Editor with request code 1 */
-            startActivityForResult(imageEditorIntent, 1);
+            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
         }
     }
 

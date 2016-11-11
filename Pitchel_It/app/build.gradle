@@ -8,7 +8,7 @@ android {
     buildToolsVersion "24.0.3"
     defaultConfig {
         applicationId "cs371m.denisely.pitchel_it"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 23
 
         versionCode 1

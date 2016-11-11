@@ -3,6 +3,7 @@
     package="cs371m.denisely.pitchel_it">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:debuggable="true"
@@ -25,7 +26,6 @@
         <activity
             android:name=".GalleryActivity"
             android:label="Gallery"
-            android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
