@@ -1,7 +1,9 @@
 package cs371m.denisely.pitchel_it;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
@@ -9,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     static final int PICK_IMAGE = 100;
     static final int EDIT_IMAGE_SUCCESS = 200;
     static final int TAKE_PHOTO = 300;
+    static final int REQUEST_READWRITE_STORAGE = 1;
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
     File newDestination;
@@ -44,6 +49,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Ask for permission to access pictures.
+        // Important for when user opens app after installation and Pitchel It folder is already present
+        int permissionCheck1 = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int permissionCheck2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permissionCheck1 != PackageManager.PERMISSION_GRANTED || permissionCheck2 != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_READWRITE_STORAGE);
+
+            // On new installation with Pitchel It folder already present,
+            // Horizontal scroll view doesn't populate the first time, even if
+            // given permission. Need to refresh it somehow?
+        }
+
 
         Button takePhoto = (Button) findViewById(R.id.take_photo);
         takePhoto.setOnClickListener(new View.OnClickListener() {
@@ -101,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
         //http://stackoverflow.com/questions/32109917/how-to-create-a-horizontal-list-of-pictures-with-title-in-android
         File[] listFiles = destination.listFiles();
+        System.out.println("CREATING HORIZONTAL LIST VIEW");
+        System.out.println(destination.isDirectory());
+
         if (listFiles != null && listFiles.length > 0) {
             LinearLayout layout = (LinearLayout) findViewById(R.id.image_container);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
