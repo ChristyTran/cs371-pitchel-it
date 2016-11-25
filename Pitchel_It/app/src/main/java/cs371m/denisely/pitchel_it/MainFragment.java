@@ -153,6 +153,9 @@ public class MainFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data){
+        Log.d("request_code", "REQUEST CODE IS: " + requestCode);
+        Log.d("result_code", "RESULT CODE IS: " + resultCode);
+        Log.e("null_data", "Warning, null data from intent");
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null){
             // Just picked image from device gallery
             /* 1) Get uri of that image */

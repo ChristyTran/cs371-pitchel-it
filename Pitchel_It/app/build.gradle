@@ -16,6 +16,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [appPackageName: "${applicationId}"]
+
     }
     buildTypes {
         release {
