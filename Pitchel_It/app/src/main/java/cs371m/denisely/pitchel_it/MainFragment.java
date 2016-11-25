@@ -27,6 +27,7 @@ import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
 
 import java.io.File;
+import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -88,13 +89,18 @@ public class MainFragment extends Fragment {
             }
 
             // Setting up destination aka new file name
-            listFiles = destination.listFiles();
-            int num = 0;
-            if (listFiles != null && listFiles.length != 0) {
-                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
-                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
-            }
-            String newPhotoName = "photo-" + num + ".jpg";
+//            listFiles = destination.listFiles();
+//            int num = 0;
+//            if (listFiles != null && listFiles.length != 0) {
+//                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
+//                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
+//            }
+
+            Random rand = new Random();
+            int val1 = rand.nextInt(9999);
+            int val2 = rand.nextInt(9999);
+
+            String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
             newDestination = new File(destination.toString(), newPhotoName);
 
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -168,13 +174,18 @@ public class MainFragment extends Fragment {
             }
 
             // Setting up destination aka new file name
-            listFiles = destination.listFiles();
-            int num = 0;
-            if (listFiles != null && listFiles.length != 0) {
-                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
-                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
-            }
-            String newPhotoName = "photo-" + num + ".jpg";
+//            listFiles = destination.listFiles();
+//            int num = 0;
+//            if (listFiles != null && listFiles.length != 0) {
+//                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
+//                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
+//            }
+
+            Random rand = new Random();
+            int val1 = rand.nextInt(9999);
+            int val2 = rand.nextInt(9999);
+
+            String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
             newDestination = new File(destination.toString(), newPhotoName);
 
             Intent imageEditorIntent = new AdobeImageIntent.Builder(myRootView.getContext())
@@ -187,7 +198,8 @@ public class MainFragment extends Fragment {
 
              /* 3) Start the Image Editor with request code 1 */
             startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
-        } else if (requestCode == TAKE_PHOTO && resultCode == RESULT_OK && data != null){
+        } else if (requestCode == TAKE_PHOTO ){ // && resultCode == RESULT_OK && data != null
+            Log.d("take photo result", "newDestination in TAKE_PHOTO result is: " + newDestination.toString());
             File dest = new File(newDestination.toString());
             // Rescan gallery. If image is taken and back is pressed during editing (photo taken
             // wasn't edited), should still save that taken image to the gallery & device's gallery
