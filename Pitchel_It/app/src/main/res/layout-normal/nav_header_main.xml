@@ -9,17 +9,18 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:orientation="vertical"
     android:gravity="bottom">
-    <!--android:background="@drawable/logo"-->
 
     <TextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
-        android:text="CS 371M DemoFirebase"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:text="Log onto your account"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textColor="@android:color/black" />
 
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Not Logged In"
+        android:text="Status of account"
+        android:textColor="@android:color/black"
         android:id="@+id/drawerIDText" />
 
 </LinearLayout>

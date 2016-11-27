@@ -1,9 +1,6 @@
 package cs371m.denisely.pitchel_it;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +8,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +19,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
-
 import static android.os.Environment.getExternalStorageState;
 
 public class MainActivity extends AppCompatActivity
@@ -50,7 +47,6 @@ public class MainActivity extends AppCompatActivity
                 super.onDrawerOpened(drawerView);
                 // Putting it here means you can see it change
 //                updateUserDisplay();
-                Toast.makeText(getApplicationContext(), "Poop", Toast.LENGTH_SHORT).show();
             }
         };
         drawer.addDrawerListener(toggle);
@@ -75,11 +71,6 @@ public class MainActivity extends AppCompatActivity
 //    public void onStart(){
 //        super.onStart();
 //    }
-
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return true;
-
-    }
 
 //        protected void updateUserDisplay() {
 //        String loginString = "";
@@ -126,6 +117,44 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // When user selects something from navigation drawer
+        int id = item.getItemId();
+//        if (id == R.id.nav_logon) {
+////            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//            if (user != null) {
+////                mAuth.signOut(); // Will call updateUserDisplay via callback
+////                return true;
+//            } else {
+//                toggleHamburgerToBack();
+//                LoginFragment flf = LoginFragment.newInstance();
+//                FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                // Replace any other Fragment with our new Details Fragment with the right data
+//                ft.add(R.id.main_frame, flf);
+//                // Let us come back
+//                ft.addToBackStack(null);
+//                // TRANSIT_FRAGMENT_FADE calls for the Fragment to fade away
+//                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//                ft.commit();
+//            }
+        if (id == R.id.nav_logon){
+            Toast.makeText(this, "LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
+            LoginFragment loginFragment = LoginFragment.newInstance();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.main_frame, loginFragment);
+            ft.addToBackStack(null);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.commit();
+        } else if (id == R.id.nav_logon_anon) {
+            Toast.makeText(this, "ANON LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -151,5 +180,31 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         return false;
+    }
+
+
+    public void firebaseLoginFinish() {
+        // Dismiss the Login fragment
+        getFragmentManager().popBackStack();
+        // Toggle back button to hamburger
+        toggle.setDrawerIndicatorEnabled(true);
+    }
+
+    public void firebaseFromLoginToCreateAccount() {
+        // Dismiss the Login fragment
+//        getFragmentManager().popBackStack();
+//        // Toggle back button to hamburger
+//        toggle.setDrawerIndicatorEnabled(true);
+//        toggleHamburgerToBack();
+//
+//        // Replace main screen with the create account fragment
+//        CreateAccountFragment fcaf = CreateAccountFragment.newInstance();
+//        FragmentTransaction ft = getFragmentManager().beginTransaction();
+//        ft.add(R.id.main_frame, fcaf);
+//        // Let us pop without explicit fragment remove
+//        ft.addToBackStack(null);
+//        // TRANSIT_FRAGMENT_FADE calls for the Fragment to fade away
+//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//        ft.commit();
     }
 }

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "534385235818",
+    "firebase_url": "https://pitchel-it.firebaseio.com",
+    "project_id": "pitchel-it",
+    "storage_bucket": "pitchel-it.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534385235818:android:823572c75f9b79ff",
+        "android_client_info": {
+          "package_name": "cs371m.denisely.pitchel_it"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534385235818-nv6edm2oiv211al0a4tva02qp9s3bmu1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cs371m.denisely.pitchel_it",
+            "certificate_hash": "026AAB915092A6E4725825AAA8C8DA1345CB6E32"
+          }
+        },
+        {
+          "client_id": "534385235818-7qn10c7b7ip93vk4duugk5eadgufeja9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUqwBA_1yMGwAfx6M5jTFL2JRc6aWkNK4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "534385235818-7qn10c7b7ip93vk4duugk5eadgufeja9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

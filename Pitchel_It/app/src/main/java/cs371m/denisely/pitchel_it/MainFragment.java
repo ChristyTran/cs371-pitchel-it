@@ -130,11 +130,16 @@ public class MainFragment extends Fragment {
             startActivity(intent);
         });
 
+        displayCarousel(myRootView);
+    }
+
+    public void displayCarousel(View view){
+        //TODO: update when you import or take a photo
         //http://stackoverflow.com/questions/32109917/how-to-create-a-horizontal-list-of-pictures-with-title-in-androidW
         listFiles = destination.listFiles();
 
         if (listFiles != null && listFiles.length > 0) {
-            LinearLayout layout = (LinearLayout) v.findViewById(R.id.image_container);
+            LinearLayout layout = (LinearLayout) view.findViewById(R.id.image_container);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             int count = 6;
             if (listFiles.length < 6) {
@@ -144,15 +149,13 @@ public class MainFragment extends Fragment {
             for (int i = 0; i < count; i++) {
                 layoutParams.setMargins(15, 0, 15, 20);
                 layoutParams.gravity = Gravity.CENTER;
-                ImageView imageView = new ImageView(v.getContext());
+                ImageView imageView = new ImageView(view.getContext());
                 imageView.setAdjustViewBounds(true);
                 Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFiles[i].toString()));
                 imageView.setImageBitmap(myBitmap);
                 //imageView.setOnClickListener(documentImageListener);
                 imageView.setLayoutParams(layoutParams);
-
                 layout.addView(imageView);
-
             }
         }
     }

@@ -64,3 +64,4 @@ dependencies {
     // For dots on splash screen
     compile 'com.github.bhargavms:DotLoader:1.0.1'
 }
+apply plugin: 'com.google.gms.google-services'
