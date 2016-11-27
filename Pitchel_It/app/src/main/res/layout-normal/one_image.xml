@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/one_image"
-        android:id="@+id/image_name"/>
+        android:id="@+id/image_name"
+        android:textAlignment="center"/>
 
 </RelativeLayout>

@@ -74,7 +74,7 @@ public class MainFragment extends Fragment {
                             Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_READWRITE_STORAGE);
 
-            // On new installation with Pitchel It folder already present,
+            // TODO: On new installation with Pitchel It folder already present,
             // Horizontal scroll view doesn't populate the first time, even if
             // given permission. Need to refresh it somehow?
         }
@@ -148,7 +148,7 @@ public class MainFragment extends Fragment {
                 imageView.setAdjustViewBounds(true);
                 Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFiles[i].toString()));
                 imageView.setImageBitmap(myBitmap);
-                //            imageView.setOnClickListener(documentImageListener);
+                //imageView.setOnClickListener(documentImageListener);
                 imageView.setLayoutParams(layoutParams);
 
                 layout.addView(imageView);

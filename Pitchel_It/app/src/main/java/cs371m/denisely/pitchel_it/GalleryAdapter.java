@@ -1,5 +1,7 @@
 package cs371m.denisely.pitchel_it;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,20 +25,24 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     private File[] files;
     public static int maxW = 500;
     public static int maxH = 500;
+    private Context context;
 
-    public GalleryAdapter(File[] files) { this.files = files; }
+    public GalleryAdapter(File[] files, Context context) {
+        this.files = files;
+        this.context = context;
+    }
 
 
     @Override
     public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.gallery_thumbnail, parent, false);
 
-        itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "Test", Toast.LENGTH_LONG);
-            }
-        });
+//        itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //Toast.makeText(v.getContext(), "Test", Toast.LENGTH_LONG).show();
+//            }
+//        });
 
         return new GalleryViewHolder(itemView);
     }
@@ -44,8 +50,20 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
     @Override
     public void onBindViewHolder(GalleryViewHolder holder, int position) {
         File pictureName = files[position];
-        Bitmap bitmap = scaleBitmapAndKeepRatio( BitmapFactory.decodeFile(pictureName.toString()));
+        Bitmap bitmap = scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(pictureName.toString()));
         holder.thumbnail.setImageBitmap(bitmap);
+
+        holder.thumbnail.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v){
+                // Start new OneImage Activity
+                Intent intent = new Intent(context, OneImage.class);
+                intent.putExtra("thumbnail_path", files[position].toString());
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        });
     }
 
     public static Bitmap scaleBitmapAndKeepRatio(Bitmap bitmap) {

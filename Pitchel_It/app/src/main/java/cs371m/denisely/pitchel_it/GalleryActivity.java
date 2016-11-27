@@ -33,7 +33,7 @@ public class GalleryActivity extends Activity {
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
-        GalleryAdapter galleryAdapter = new GalleryAdapter(listFile);
+        GalleryAdapter galleryAdapter = new GalleryAdapter(listFile, getApplicationContext());
         recyclerView.setAdapter(galleryAdapter);
     }
 
