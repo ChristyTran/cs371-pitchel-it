@@ -4,4 +4,11 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="share_facebook">Share on Facebook</string>
+    <string name="share_instagram">Share on Instagram</string>
+    <string name="share_twitter">Share on Twitter</string>
+
+    <string name="facebook_app_id">1311779528880602</string>
+
 </resources>

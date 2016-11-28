@@ -18,11 +18,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.io.ByteArrayOutputStream;
 import static android.os.Environment.getExternalStorageState;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener
+        implements NavigationView.OnNavigationItemSelectedListener,
+        LoginFragment.LoginInterface
 {
 
     protected ActionBarDrawerToggle toggle;

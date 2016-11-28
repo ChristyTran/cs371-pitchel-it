@@ -133,13 +133,15 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
         // Set up carousel recycler view
         // TODO: fix spacing on carousel.. kinda funky sometimes
-        carouselFiles = getCarouselFiles();
-        carousel = (RecyclerView) v.findViewById(R.id.carousel_rv);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
-        carouselAdapter = new CarouselAdapter(carouselFiles, getActivity());
-        carouselAdapter.setCarouselClickListener(this);
-        carousel.setLayoutManager(layoutManager);
-        carousel.setAdapter(carouselAdapter);
+        if(isDirectory){
+            carouselFiles = getCarouselFiles();
+            carousel = (RecyclerView) v.findViewById(R.id.carousel_rv);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+            carouselAdapter = new CarouselAdapter(carouselFiles, getActivity());
+            carouselAdapter.setCarouselClickListener(this);
+            carousel.setLayoutManager(layoutManager);
+            carousel.setAdapter(carouselAdapter);
+        }
     }
 
     public ArrayList<File> getCarouselFiles(){
@@ -233,6 +235,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         } else if (requestCode == EDIT_IMAGE_SUCCESS){
             Log.d("edit image success", "Edit image success.");
             updateCarouselFiles();
+            //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
         }
     }

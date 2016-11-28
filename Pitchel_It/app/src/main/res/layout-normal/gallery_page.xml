@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/recycler_view"
         android:layout_below="@id/gallery_text"
-        android:paddingTop="25dp">
+        android:paddingTop="26dp">
 
     </android.support.v7.widget.RecyclerView>
 

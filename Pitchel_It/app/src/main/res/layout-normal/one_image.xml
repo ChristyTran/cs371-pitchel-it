@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -14,6 +15,34 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/one_image"
         android:id="@+id/image_name"
-        android:textAlignment="center"/>
+        android:gravity="center"
+        android:textColor="@color/white"/>
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_facebook"
+        android:id="@+id/share_facebook"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_instagram"
+        android:id="@+id/share_instagram"
+        android:layout_below="@+id/share_twitter"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="49dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share_twitter"
+        android:id="@+id/share_twitter"
+        android:layout_marginTop="59dp"
+        android:layout_below="@+id/share_facebook"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

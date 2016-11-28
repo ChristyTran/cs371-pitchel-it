@@ -62,6 +62,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
                 intent.putExtra("thumbnail_path", files[position].toString());
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
+                //getActivity.overridePendingTransition(android.R.anim.fade_out, android.R.anim.fade_in);
             }
         });
     }
