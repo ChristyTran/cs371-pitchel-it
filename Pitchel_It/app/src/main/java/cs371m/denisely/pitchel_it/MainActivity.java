@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -13,9 +14,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,12 +29,39 @@ import static android.os.Environment.getExternalStorageState;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        LoginFragment.LoginInterface
+        LoginFragment.LoginInterface,
+        CreateAccountFragment.CreateAccountInterface
 {
 
     protected ActionBarDrawerToggle toggle;
     protected Menu drawerMenu;
     MainFragment mainFragment;
+
+    public static String TAG = "DemoFirebase";
+    protected FirebaseAuth mAuth;
+    protected FirebaseAuth.AuthStateListener mAuthListener;
+    protected String userName;
+
+    protected void firebaseInit() {
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    userName = user.getDisplayName();
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    userName = null;
+                }
+                Log.d(TAG, "userName="+userName);
+                updateUserDisplay();
+            }
+        };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +91,8 @@ public class MainActivity extends AppCompatActivity
         drawerMenu = navigationView.getMenu();
 
 
+        //firebaseInit();
+        //updateUserDisplay();
         mainFragment = new MainFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.main_frame, mainFragment);
@@ -70,34 +102,6 @@ public class MainActivity extends AppCompatActivity
 
         ft.commit();
     }
-
-//    @Override
-//    public void onStart(){
-//        super.onStart();
-//    }
-
-//        protected void updateUserDisplay() {
-//        String loginString = "";
-//        String userString = userName;
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if (user != null) {
-//            loginString = String.format("Log out as %s", userName);
-//        } else {
-//            userString = "Please log in";
-//            loginString = "Login";
-//        }
-//        TextView dit = (TextView) findViewById(R.id.drawerIDText);
-//        if (dit != null) {
-//            dit.setText(userString);
-//        }
-//        // findViewById does not work for menu items.
-//        MenuItem logMenu = (MenuItem) drawerMenu.findItem(R.id.nav_login);
-//        if (logMenu != null) {
-//            logMenu.setTitle(loginString);
-//            logMenu.setTitleCondensed(loginString);
-//        }
-
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,12 +130,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // When user selects something from navigation drawer
         int id = item.getItemId();
-//        if (id == R.id.nav_logon) {
-////            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//            if (user != null) {
-////                mAuth.signOut(); // Will call updateUserDisplay via callback
-////                return true;
-//            } else {
 //                toggleHamburgerToBack();
 //                LoginFragment flf = LoginFragment.newInstance();
 //                FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -144,15 +142,30 @@ public class MainActivity extends AppCompatActivity
 //                ft.commit();
 //            }
         if (id == R.id.nav_logon){
-            Toast.makeText(this, "LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
-            LoginFragment loginFragment = LoginFragment.newInstance();
+            if (id == R.id.nav_logon) {
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+                if (user != null) {
+                    mAuth.signOut(); // Will call updateUserDisplay via callback
+                    return true;
+                } else {
+                    Toast.makeText(this, "LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
+                    LoginFragment loginFragment = LoginFragment.newInstance();
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.add(R.id.main_frame, loginFragment);
+                    ft.addToBackStack(null);
+                    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    ft.commit();
+                }
+            }
+        } else if (id == R.id.nav_create_account) {
+            Toast.makeText(this, "CREATE ACCOUNT BUTTON SELECTED", Toast.LENGTH_LONG).show();
+            CreateAccountFragment createAccountFragment = CreateAccountFragment.newInstance();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.main_frame, loginFragment);
+            ft.add(R.id.main_frame, createAccountFragment);
             ft.addToBackStack(null);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
-        } else if (id == R.id.nav_logon_anon) {
-            Toast.makeText(this, "ANON LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -194,21 +207,25 @@ public class MainActivity extends AppCompatActivity
         toggle.setDrawerIndicatorEnabled(true);
     }
 
-    public void firebaseFromLoginToCreateAccount() {
-        // Dismiss the Login fragment
-//        getFragmentManager().popBackStack();
-//        // Toggle back button to hamburger
-//        toggle.setDrawerIndicatorEnabled(true);
-//        toggleHamburgerToBack();
-//
-//        // Replace main screen with the create account fragment
-//        CreateAccountFragment fcaf = CreateAccountFragment.newInstance();
-//        FragmentTransaction ft = getFragmentManager().beginTransaction();
-//        ft.add(R.id.main_frame, fcaf);
-//        // Let us pop without explicit fragment remove
-//        ft.addToBackStack(null);
-//        // TRANSIT_FRAGMENT_FADE calls for the Fragment to fade away
-//        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//        ft.commit();
+    protected void updateUserDisplay() {
+        String loginString = "";
+        String userString = userName;
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            loginString = String.format("Log out as %s", userName);
+        } else {
+            userString = "Please log in";
+            loginString = "Login";
+        }
+        TextView dit = (TextView) findViewById(R.id.drawerIDText);
+        if (dit != null) {
+            dit.setText(userString);
+        }
+        // findViewById does not work for menu items.
+        MenuItem logMenu = (MenuItem) drawerMenu.findItem(R.id.nav_logon);
+        if (logMenu != null) {
+            logMenu.setTitle(loginString);
+            logMenu.setTitleCondensed(loginString);
+        }
     }
 }

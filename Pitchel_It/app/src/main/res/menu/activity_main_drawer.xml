@@ -7,9 +7,12 @@
             <item android:id="@+id/nav_logon"
                 android:icon="@android:drawable/ic_menu_share"
                 android:title="Log on" />
-            <item android:id="@+id/nav_logon_anon"
+            <item android:id="@+id/nav_log_out"
+                android:icon="@android:drawable/ic_delete"
+                android:title="Log out" />
+            <item android:id="@+id/nav_create_account"
                 android:icon="@android:drawable/ic_menu_send"
-                android:title="Log on Anonymously" />
+                android:title="Create an account" />
         </menu>
     </item>
 

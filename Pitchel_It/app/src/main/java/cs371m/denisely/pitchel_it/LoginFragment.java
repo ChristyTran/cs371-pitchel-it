@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,7 +24,6 @@ import com.google.firebase.auth.FirebaseAuth;
 public class LoginFragment extends Fragment {
     public interface LoginInterface {
         void firebaseLoginFinish();
-        void firebaseFromLoginToCreateAccount();
     }
 
     // We can have this member variable because it is initialized in onAttach
@@ -61,7 +59,7 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.login_or_create, container, false);
+        View v = inflater.inflate(R.layout.login, container, false);
         // Why doesn't getView return the root view?
         // Alternative is the less savory: getActivity().findViewById(R.id.yourId)
         myRootView = v;
@@ -102,19 +100,11 @@ public class LoginFragment extends Fragment {
                 String username = usernameView.getText().toString().trim();
                 String password = passwordView.getText().toString().trim();
 
-//                // Validate the log in data
-//                String validateString =
-//                        EmailPasswordValidate.validate(getResources(), username, password, null);
-//                // If there is a validation error, display the error
-//                if (validateString.length() > 0) {
-//                    Snackbar.make(myRootView, validateString, Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
+                // TODO: Validate shit
 
                 // Set up a progress dialog
                 final ProgressDialog dlg = new ProgressDialog(getActivity());
-                dlg.setTitle("Please wait.");
-                dlg.setMessage("Logging in.  Please wait.");
+                dlg.setTitle("Logging in. Please wait.");
                 dlg.show();
                 // Sign in
                 mAuth.signInWithEmailAndPassword(username, password)
@@ -122,13 +112,13 @@ public class LoginFragment extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 dlg.dismiss();
-                                Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                                Log.d(TAG, "Sign in complete!!!:" + task.isSuccessful());
 
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
                                 // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
-                                    Log.w(TAG, "signInWithEmail " + task.getException().getMessage());
+                                    Log.w(TAG, "Sing in failed!!!!! " + task.getException().getMessage());
                                     Snackbar.make(myRootView,
                                             "Authentication failed: " + task.getException().getMessage(),
                                             Snackbar.LENGTH_LONG)
