@@ -41,14 +41,14 @@ import static android.app.Activity.RESULT_OK;
  * Created by Denise on 11/22/2016.
  */
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements CarouselAdapter.CarouselClickListener{
     // TODO: Make this faster.. so slow
     protected View myRootView;
 
-    static final int PICK_IMAGE = 100;
-    static final int EDIT_IMAGE_SUCCESS = 200;
-    static final int TAKE_PHOTO = 300;
-    static final int REQUEST_READWRITE_STORAGE = 1;
+    final int PICK_IMAGE = 100;
+    final int EDIT_IMAGE_SUCCESS = 200;
+    final int TAKE_PHOTO = 300;
+    final int REQUEST_READWRITE_STORAGE = 1;
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
     File newDestination;
@@ -88,7 +88,6 @@ public class MainFragment extends Fragment {
             // Horizontal scroll view doesn't populate the first time, even if
             // given permission. Need to refresh it somehow?
         }
-
 
         Button takePhoto = (Button) v.findViewById(R.id.take_photo);
         takePhoto.setOnClickListener(v1 -> {
@@ -132,10 +131,13 @@ public class MainFragment extends Fragment {
             startActivity(intent);
         });
 
+        // Set up carousel recycler view
+        // TODO: fix spacing on carousel.. kinda funky sometimes
         carouselFiles = getCarouselFiles();
         carousel = (RecyclerView) v.findViewById(R.id.carousel_rv);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
-        carouselAdapter = new CarouselAdapter(carouselFiles);
+        carouselAdapter = new CarouselAdapter(carouselFiles, getActivity());
+        carouselAdapter.setCarouselClickListener(this);
         carousel.setLayoutManager(layoutManager);
         carousel.setAdapter(carouselAdapter);
     }
@@ -152,7 +154,7 @@ public class MainFragment extends Fragment {
             }
         }
         ArrayUtils.reverse(result);
-        return new ArrayList<File>(Arrays.asList(result));
+        return new ArrayList<>(Arrays.asList(result));
     }
 
     public ArrayList<File> updateCarouselFiles(){
@@ -233,5 +235,27 @@ public class MainFragment extends Fragment {
             updateCarouselFiles();
             carousel.getAdapter().notifyDataSetChanged();
         }
+    }
+
+    @Override
+    public void onCarouselItemClicked(File picture) {
+//         Start new OneImage Activity
+        Random rand = new Random();
+        int val1 = rand.nextInt(9999);
+        int val2 = rand.nextInt(9999);
+
+        String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
+        newDestination = new File(destination.toString(), newPhotoName);
+
+        Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())
+                .setData(Uri.fromFile(picture))
+                .withOutput(newDestination)
+                .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
+                .withOutputSize(MegaPixels.Mp5) // output size
+                .withOutputQuality(90) // output quality
+                .build();
+
+        /* 3) Start the Image Editor with request code 1 */
+        startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
     }
 }
