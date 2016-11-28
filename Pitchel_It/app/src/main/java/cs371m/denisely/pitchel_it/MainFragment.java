@@ -1,5 +1,6 @@
 package cs371m.denisely.pitchel_it;
 
+import java.util.*;
 import android.Manifest;
 import android.app.Fragment;
 import android.content.Intent;
@@ -14,17 +15,22 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.File;
 import java.util.Random;
@@ -48,6 +54,10 @@ public class MainFragment extends Fragment {
     File newDestination;
     boolean isDirectory = false;
     File[] listFiles;
+
+    private RecyclerView carousel;
+    CarouselAdapter carouselAdapter;
+    ArrayList<File> carouselFiles;
 
     @Nullable
     @Override
@@ -88,14 +98,6 @@ public class MainFragment extends Fragment {
                 isDirectory = true;
             }
 
-            // Setting up destination aka new file name
-//            listFiles = destination.listFiles();
-//            int num = 0;
-//            if (listFiles != null && listFiles.length != 0) {
-//                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
-//                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
-//            }
-
             Random rand = new Random();
             int val1 = rand.nextInt(9999);
             int val2 = rand.nextInt(9999);
@@ -130,34 +132,36 @@ public class MainFragment extends Fragment {
             startActivity(intent);
         });
 
-        displayCarousel(myRootView);
+        carouselFiles = getCarouselFiles();
+        carousel = (RecyclerView) v.findViewById(R.id.carousel_rv);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
+        carouselAdapter = new CarouselAdapter(carouselFiles);
+        carousel.setLayoutManager(layoutManager);
+        carousel.setAdapter(carouselAdapter);
     }
 
-    public void displayCarousel(View view){
-        //TODO: update when you import or take a photo
-        //http://stackoverflow.com/questions/32109917/how-to-create-a-horizontal-list-of-pictures-with-title-in-androidW
+    public ArrayList<File> getCarouselFiles(){
         listFiles = destination.listFiles();
-
-        if (listFiles != null && listFiles.length > 0) {
-            LinearLayout layout = (LinearLayout) view.findViewById(R.id.image_container);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            int count = 6;
-            if (listFiles.length < 6) {
-                count = listFiles.length;
-            }
-
-            for (int i = 0; i < count; i++) {
-                layoutParams.setMargins(15, 0, 15, 20);
-                layoutParams.gravity = Gravity.CENTER;
-                ImageView imageView = new ImageView(view.getContext());
-                imageView.setAdjustViewBounds(true);
-                Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFiles[i].toString()));
-                imageView.setImageBitmap(myBitmap);
-                //imageView.setOnClickListener(documentImageListener);
-                imageView.setLayoutParams(layoutParams);
-                layout.addView(imageView);
+        Log.d("Files for carousel", "There are " + listFiles.length + " files to be loaded into the carousel");
+        File[] result = new File[]{};
+        if (listFiles != null && listFiles.length > 0){
+            if (listFiles.length < 6){
+                result = Arrays.copyOfRange(listFiles, 0, listFiles.length);
+            } else {
+                result = Arrays.copyOfRange(listFiles, listFiles.length-6, listFiles.length);
             }
         }
+        ArrayUtils.reverse(result);
+        return new ArrayList<File>(Arrays.asList(result));
+    }
+
+    public ArrayList<File> updateCarouselFiles(){
+        listFiles = destination.listFiles();
+        if (carouselFiles.size() == 6){
+            carouselFiles.remove(carouselFiles.size()-1);
+        }
+        carouselFiles.add(0, listFiles[listFiles.length - 1]);
+        return carouselFiles;
     }
 
     @Override
@@ -175,14 +179,6 @@ public class MainFragment extends Fragment {
                 destination.mkdirs();
                 isDirectory = true;
             }
-
-            // Setting up destination aka new file name
-//            listFiles = destination.listFiles();
-//            int num = 0;
-//            if (listFiles != null && listFiles.length != 0) {
-//                String[] temp = listFiles[listFiles.length - 1].toString().split("/");
-//                num = Integer.parseInt(temp[temp.length - 1].substring(temp[temp.length - 1].indexOf('-') + 1, temp[temp.length - 1].indexOf('.'))) + 1;
-//            }
 
             Random rand = new Random();
             int val1 = rand.nextInt(9999);
@@ -227,10 +223,15 @@ public class MainFragment extends Fragment {
 
                     .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
                     .withOutputSize(MegaPixels.Mp5) // output size
-                    .withOutputQuality(90) // output quality
+                    .withOutputQuality(90) // output quality.. idk what this int means
                     .build();
 
             startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+
+        } else if (requestCode == EDIT_IMAGE_SUCCESS){
+            Log.d("edit image success", "Edit image success.");
+            updateCarouselFiles();
+            carousel.getAdapter().notifyDataSetChanged();
         }
     }
 }

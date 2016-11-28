@@ -9,13 +9,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.util.ArrayList;
 
 /**
  * Created by Denise on 11/22/2016.
  */
 
 public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageViewHolder> {
-    private File[] listFile;
+//    private File[] listFile;
+    private ArrayList<File> listFile;
 
     @Override
     public ImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -25,19 +27,19 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
         return new ImageViewHolder(itemView);
     }
 
-    public CarouselAdapter(File[] listFile){
+    public CarouselAdapter(ArrayList<File> listFile){
         this.listFile = listFile;
     }
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFile[position].toString()));
+        Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(listFile.get(position).toString()));
         holder.thumbnail.setImageBitmap(myBitmap);
     }
 
     @Override
     public int getItemCount() {
-        return listFile.length;
+        return listFile.size();
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
@@ -50,4 +52,8 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
             thumbnail = (ImageView) view.findViewById(R.id.recycler_item);
         }
     }
+
+//    public void updateCarouselList(File[] newList){
+//
+//    }
 }

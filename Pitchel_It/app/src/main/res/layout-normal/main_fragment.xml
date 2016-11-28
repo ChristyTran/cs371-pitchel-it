@@ -46,14 +46,15 @@
         android:layout_alignParentStart="true"
         android:layout_marginTop="75dp"
         >
-        <LinearLayout
+
+        <android.support.v7.widget.RecyclerView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/image_container"
             android:orientation="horizontal"
-            >
+            android:id="@+id/carousel_rv">
 
-        </LinearLayout>
+        </android.support.v7.widget.RecyclerView>
+
     </HorizontalScrollView>
 
     <Button
