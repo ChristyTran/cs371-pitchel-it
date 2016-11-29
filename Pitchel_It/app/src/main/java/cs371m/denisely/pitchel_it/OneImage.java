@@ -2,10 +2,13 @@ package cs371m.denisely.pitchel_it;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -102,7 +105,14 @@ public class OneImage extends Activity {
         share_ig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (verificaInstagram()){
+                    Intent igShareIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    igShareIntent.setType("image/*");
+                    Uri imageUri = Uri.fromFile(new File(file_path));
+                    igShareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    igShareIntent.setPackage("com.instagram.android");
+                    startActivity(igShareIntent);
+                }
             }
         });
     }
@@ -124,5 +134,20 @@ public class OneImage extends Activity {
     {
         super.onActivityResult(requestCode, responseCode, data);
         callbackManager.onActivityResult(requestCode, responseCode, data);
+    }
+
+    private boolean verificaInstagram(){
+        boolean installed = false;
+
+        try {
+            ApplicationInfo info = getPackageManager().getApplicationInfo("com.instagram.android", 0);
+            installed = true;
+            Log.d("Instagram", "Instagram is installed");
+        } catch (PackageManager.NameNotFoundException e) {
+            installed = false;
+            Log.d("Instagram", "Instagram is NOT installed");
+//            Toast.makeText(OneImage.this, "Instagram is not installed!", Toast.LENGTH_SHORT);
+        }
+        return installed;
     }
 }
