@@ -42,7 +42,6 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class MainFragment extends Fragment implements CarouselAdapter.CarouselClickListener{
-    // TODO: Make this faster.. so slow
     protected View myRootView;
 
     final int PICK_IMAGE = 100;
