@@ -17,6 +17,7 @@ android {
 
         manifestPlaceholders = [appPackageName: "${applicationId}"]
 
+        multiDexEnabled true
     }
     buildTypes {
         release {

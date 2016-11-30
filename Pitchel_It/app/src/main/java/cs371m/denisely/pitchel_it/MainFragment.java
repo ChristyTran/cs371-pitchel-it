@@ -141,7 +141,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
     public ArrayList<File> getCarouselFiles(){
         listFiles = destination.listFiles();
-        Log.d("Files for carousel", "There are " + listFiles.length + " files to be loaded into the carousel");
+//        Log.d("Files for carousel", "There are " + listFiles.length + " files to be loaded into the carousel");
         File[] result = new File[]{};
         if (listFiles != null && listFiles.length > 0){
             if (listFiles.length < 6){
