@@ -13,8 +13,6 @@ public class EditActivity extends Application implements IAdobeAuthClientCredent
     /* Be sure to fill in the two strings below. */
     private static final String CREATIVE_SDK_CLIENT_ID = "362fbe23c0c24e789af42399c9636d58";
     private static final String CREATIVE_SDK_CLIENT_SECRET = "9ae86d91-7eb8-4c58-b1b8-0e6999feea68";
-//        private static final String CREATIVE_SDK_CLIENT_SECRET = "93ff32a5efa74ac2953e3cfbd2fc5a5b";
-
 
     @Override
     public void onCreate() {

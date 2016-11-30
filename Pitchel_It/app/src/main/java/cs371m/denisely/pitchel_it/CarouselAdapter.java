@@ -26,14 +26,8 @@ import java.util.Random;
  */
 
 public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageViewHolder> {
-    //    private File[] listFile;
     private ArrayList<File> listFile;
     private Context context;
-
-    File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
-    File newDestination;
-
-    static final int EDIT_IMAGE_SUCCESS = 200;
 
     private CarouselClickListener carouselClickListener;
 
@@ -45,9 +39,8 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
         return new ImageViewHolder(itemView);
     }
 
-    public CarouselAdapter(ArrayList<File> listFile, Context context) {
+    public CarouselAdapter(ArrayList<File> listFile) {
         this.listFile = listFile;
-        this.context = context;
     }
 
     // Need this interface for editImage intent to go back to MainFragment's onActivityResult
@@ -71,7 +64,6 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
             public void onClick(View v) {
                 // Start new OneImage Activity
                 holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-
                     @Override
                     public void onClick(View v) {
                         carouselClickListener.onCarouselItemClicked(picture);

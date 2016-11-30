@@ -47,8 +47,8 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
     File newDestination;
-    boolean isDirectory = false;
     File[] listFiles;
+    boolean isDirectory = false;
 
     private RecyclerView carousel;
     CarouselAdapter carouselAdapter;
@@ -78,26 +78,18 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_READWRITE_STORAGE);
-
-            // TODO: On new installation with Pitchel It folder already present,
-            // Horizontal scroll view doesn't populate the first time, even if
-            // given permission. Need to refresh it somehow?
         }
 
         Button takePhoto = (Button) v.findViewById(R.id.take_photo);
         takePhoto.setOnClickListener(v1 -> {
             // Getting new file path
-            if (!isDirectory){ // If the Pitchel-It folder isn't there yet, create it
+            // If the Pitchel-It folder isn't there yet, create it
+            if (!isDirectory){
                 destination.mkdirs();
                 isDirectory = true;
             }
 
-            Random rand = new Random();
-            int val1 = rand.nextInt(9999);
-            int val2 = rand.nextInt(9999);
-
-            String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
-            newDestination = new File(destination.toString(), newPhotoName);
+            newDestination = getNewDestination();
 
             Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(newDestination));
@@ -132,16 +124,24 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             carouselFiles = getCarouselFiles();
             carousel = (RecyclerView) v.findViewById(R.id.carousel_rv);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(v.getContext(), LinearLayoutManager.HORIZONTAL, false);
-            carouselAdapter = new CarouselAdapter(carouselFiles, getActivity());
+            carouselAdapter = new CarouselAdapter(carouselFiles);
             carouselAdapter.setCarouselClickListener(this);
             carousel.setLayoutManager(layoutManager);
             carousel.setAdapter(carouselAdapter);
         }
     }
 
+    public File getNewDestination(){
+        Random rand = new Random();
+        int val1 = rand.nextInt(9999);
+        int val2 = rand.nextInt(9999);
+
+        String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
+        return new File(destination.toString(), newPhotoName);
+    }
+
     public ArrayList<File> getCarouselFiles(){
         listFiles = destination.listFiles();
-//        Log.d("Files for carousel", "There are " + listFiles.length + " files to be loaded into the carousel");
         File[] result = new File[]{};
         if (listFiles != null && listFiles.length > 0){
             if (listFiles.length < 6){
@@ -170,32 +170,15 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         Log.e("null_data", "Warning, null data from intent");
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && data != null){
             // Just picked image from device gallery
-            /* 1) Get uri of that image */
-            Uri imageUri = data.getData();
-
-             /* 2) Create a new Intent for imageEditor & set picked image*/
-            if (!isDirectory){ // If the Pitchel-It folder isn't there yet, create it
+            // If the Pitchel-It folder isn't there yet, create it
+            if (!isDirectory){
                 destination.mkdirs();
                 isDirectory = true;
             }
 
-            Random rand = new Random();
-            int val1 = rand.nextInt(9999);
-            int val2 = rand.nextInt(9999);
+            newDestination = getNewDestination();
+            startEditActivity(data.getData(), newDestination);
 
-            String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
-            newDestination = new File(destination.toString(), newPhotoName);
-
-            Intent imageEditorIntent = new AdobeImageIntent.Builder(myRootView.getContext())
-                    .setData(imageUri)
-                    .withOutput(newDestination)
-                    .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
-                    .withOutputSize(MegaPixels.Mp5) // output size
-                    .withOutputQuality(90) // output quality
-                    .build();
-
-             /* 3) Start the Image Editor with request code 1 */
-            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
         } else if (requestCode == TAKE_PHOTO ){ // && resultCode == RESULT_OK && data != null
             Log.d("take photo result", "newDestination in TAKE_PHOTO result is: " + newDestination.toString());
             File dest = new File(newDestination.toString());
@@ -209,23 +192,13 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
                         Log.d("ExternalStorage", "-> uri=" + uri);
                     });
 
-            Uri imageBitmap = Uri.fromFile(newDestination);
-
-            if (!isDirectory){ // If the Pitchel-It folder isn't there yet, create it
+            // If the Pitchel-It folder isn't there yet, create it
+            if (!isDirectory){
                 destination.mkdirs();
                 isDirectory = true;
             }
 
-            Intent imageEditorIntent = new AdobeImageIntent.Builder(myRootView.getContext())
-                    .setData(imageBitmap)
-                    .withOutput(dest)
-
-                    .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
-                    .withOutputSize(MegaPixels.Mp5) // output size
-                    .withOutputQuality(90) // output quality.. idk what this int means
-                    .build();
-
-            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+            startEditActivity(Uri.fromFile(newDestination), newDestination);
 
         } else if (requestCode == EDIT_IMAGE_SUCCESS && resultCode == RESULT_OK && data != null){
             Log.d("edit image success", "Edit image success.");
@@ -235,25 +208,23 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         }
     }
 
-    @Override
-    public void onCarouselItemClicked(File picture) {
-//         Start new OneImage Activity
-        Random rand = new Random();
-        int val1 = rand.nextInt(9999);
-        int val2 = rand.nextInt(9999);
-
-        String newPhotoName = "photo-" + val1 + "_" + val2 + ".jpg";
-        newDestination = new File(destination.toString(), newPhotoName);
-
-        Intent imageEditorIntent = new AdobeImageIntent.Builder(getActivity())
-                .setData(Uri.fromFile(picture))
-                .withOutput(newDestination)
+    public void startEditActivity(Uri data, File newDest){
+        Intent imageEditorIntent = new AdobeImageIntent.Builder(myRootView.getContext())
+                .setData(data)
+                .withOutput(newDest)
                 .withOutputFormat(Bitmap.CompressFormat.JPEG) // output format
                 .withOutputSize(MegaPixels.Mp5) // output size
-                .withOutputQuality(90) // output quality
+                .withOutputQuality(90) // output quality.. idk what this int means
                 .build();
 
-        /* 3) Start the Image Editor with request code 1 */
         startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+    }
+
+    @Override
+    public void onCarouselItemClicked(File picture) {
+        // Start new OneImage Activity
+        newDestination = getNewDestination();
+        startEditActivity(Uri.fromFile(picture), newDestination);
+
     }
 }

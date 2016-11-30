@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity
     protected Menu drawerMenu;
     MainFragment mainFragment;
 
-    public static String TAG = "DemoFirebase";
     protected FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
     protected String userName;
@@ -59,14 +58,11 @@ public class MainActivity extends AppCompatActivity
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     userName = user.getDisplayName();
                 } else {
                     // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
                     userName = null;
                 }
-                Log.d(TAG, "userName="+userName);
                 updateUserDisplay();
             }
         };
@@ -78,6 +74,39 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initializeFacebook();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        drawerMenu = navigationView.getMenu();
+
+        firebaseInit();
+        updateUserDisplay();
+        mainFragment = new MainFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.main_frame, mainFragment);
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+
+        ft.commit();
+    }
+
+    public void initializeFacebook(){
         //Facebook
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
@@ -97,61 +126,12 @@ public class MainActivity extends AppCompatActivity
         } catch (NoSuchAlgorithmException e) {
 
         }
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                // Putting it here means you can see it change
-//                updateUserDisplay();
-            }
-        };
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        drawerMenu = navigationView.getMenu();
-
-
-        firebaseInit();
-        updateUserDisplay();
-        mainFragment = new MainFragment();
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(R.id.main_frame, mainFragment);
-        // TRANSIT_FRAGMENT_FADE calls for the Fragment to fade away
-//        ft.addToBackStack(null);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-
-        ft.commit();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -159,26 +139,15 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // When user selects something from navigation drawer
         int id = item.getItemId();
-//                toggleHamburgerToBack();
-//                LoginFragment flf = LoginFragment.newInstance();
-//                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                // Replace any other Fragment with our new Details Fragment with the right data
-//                ft.add(R.id.main_frame, flf);
-//                // Let us come back
-//                ft.addToBackStack(null);
-//                // TRANSIT_FRAGMENT_FADE calls for the Fragment to fade away
-//                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//                ft.commit();
-//            }
+
         if (id == R.id.nav_logon){
             if (id == R.id.nav_logon) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
                 if (user != null) {
-                    mAuth.signOut(); // Will call updateUserDisplay via callback
+                    mAuth.signOut();
                     return true;
                 } else {
-                    Toast.makeText(this, "LOG ON BUTTON SELECTED", Toast.LENGTH_LONG).show();
                     LoginFragment loginFragment = LoginFragment.newInstance();
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     ft.add(R.id.main_frame, loginFragment);
@@ -188,7 +157,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         } else if (id == R.id.nav_create_account) {
-            Toast.makeText(this, "CREATE ACCOUNT BUTTON SELECTED", Toast.LENGTH_LONG).show();
             CreateAccountFragment createAccountFragment = CreateAccountFragment.newInstance();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.main_frame, createAccountFragment);
@@ -196,7 +164,6 @@ public class MainActivity extends AppCompatActivity
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
         } else if (id == R.id.nav_log_out){ //TODO: handle logout
-            Toast.makeText(this, "LOG OUT BUBTTON SELECTED", Toast.LENGTH_LONG).show();
             mAuth.signOut();
             userName = null;
             updateUserDisplay();
@@ -204,14 +171,6 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        return Uri.parse(path);
     }
 
     /* Checks if external storage is available for read and write */

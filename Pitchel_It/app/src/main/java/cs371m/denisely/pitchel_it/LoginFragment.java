@@ -26,17 +26,12 @@ public class LoginFragment extends Fragment {
         void firebaseLoginFinish();
     }
 
-    // We can have this member variable because it is initialized in onAttach
-    // If the system kills us when memory is low, it will reattach and reinitialize this variable
     private LoginInterface LoginInterface;
     private FirebaseAuth mAuth;
     public static String TAG = "Flogin";
     protected View myRootView;
     protected Button loginBut;
-    protected Button anonLoginBut;
-    protected Button createFragBut;
 
-    // If create is false, log in screen and log in action, otherwise create account screen and action
     static LoginFragment newInstance() {
         LoginFragment LoginFragment = new LoginFragment();
         return LoginFragment;
@@ -45,38 +40,22 @@ public class LoginFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            LoginInterface = (LoginInterface) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement FirebaseEmailPasswordInterface ");
-        }
+        LoginInterface = (LoginInterface) context;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //return super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.login, container, false);
-        // Why doesn't getView return the root view?
-        // Alternative is the less savory: getActivity().findViewById(R.id.yourId)
         myRootView = v;
         loginBut = (Button) v.findViewById(R.id.login);
-//        anonLoginBut = (Button) v.findViewById(R.id.a);
-        if (loginBut == null || anonLoginBut == null) {
-            Log.d(TAG, "Null buttons!");
-        }
         return v;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // Set up the login form.
         View v = myRootView;
-        // These are final because they are accessed from inner classes
         final EditText usernameView = (EditText) v.findViewById(R.id.username);
         final EditText passwordView = (EditText) v.findViewById(R.id.password);
         mAuth = FirebaseAuth.getInstance();
@@ -94,19 +73,16 @@ public class LoginFragment extends Fragment {
         });
 
 
-        // Set up the submit button click handler
         loginBut.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 String username = usernameView.getText().toString().trim();
                 String password = passwordView.getText().toString().trim();
 
-                // TODO: Validate shit
+                // TODO: Validate username, pw
 
-                // Set up a progress dialog
                 final ProgressDialog dlg = new ProgressDialog(getActivity());
-                dlg.setTitle("Logging in. Please wait.");
+                dlg.setMessage("Logging in. Please wait.");
                 dlg.show();
-                // Sign in
                 mAuth.signInWithEmailAndPassword(username, password)
                         .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                             @Override
@@ -114,9 +90,6 @@ public class LoginFragment extends Fragment {
                                 dlg.dismiss();
                                 Log.d(TAG, "Sign in complete!!!:" + task.isSuccessful());
 
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
                                     Log.w(TAG, "Sing in failed!!!!! " + task.getException().getMessage());
                                     Snackbar.make(myRootView,
