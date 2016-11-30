@@ -6,7 +6,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,14 +17,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
@@ -231,7 +227,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
 
-        } else if (requestCode == EDIT_IMAGE_SUCCESS){
+        } else if (requestCode == EDIT_IMAGE_SUCCESS && resultCode == RESULT_OK && data != null){
             Log.d("edit image success", "Edit image success.");
             updateCarouselFiles();
             //Update the carousel with new image
