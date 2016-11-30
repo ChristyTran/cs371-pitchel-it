@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity
         drawerMenu = navigationView.getMenu();
 
 
-        //firebaseInit();
-        //updateUserDisplay();
+        firebaseInit();
+        updateUserDisplay();
         mainFragment = new MainFragment();
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.main_frame, mainFragment);
@@ -195,6 +195,11 @@ public class MainActivity extends AppCompatActivity
             ft.addToBackStack(null);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
+        } else if (id == R.id.nav_log_out){ //TODO: handle logout
+            Toast.makeText(this, "LOG OUT BUBTTON SELECTED", Toast.LENGTH_LONG).show();
+            mAuth.signOut();
+            userName = null;
+            updateUserDisplay();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -228,12 +233,14 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-
+    @Override
     public void firebaseLoginFinish() {
         // Dismiss the Login fragment
         getFragmentManager().popBackStack();
         // Toggle back button to hamburger
         toggle.setDrawerIndicatorEnabled(true);
+
+        updateUserDisplay();
     }
 
     protected void updateUserDisplay() {
@@ -241,10 +248,16 @@ public class MainActivity extends AppCompatActivity
         String userString = userName;
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            loginString = String.format("Log out as %s", userName);
+            Log.d("Current user:", user.getEmail());
+            userName = user.getEmail();
+            loginString = String.format("Logged in as %s", user.getEmail());
+            drawerMenu.findItem(R.id.nav_log_out).setVisible(true);
+            drawerMenu.findItem(R.id.nav_create_account).setVisible(false);
         } else {
+            Log.d("Current user?", "No current user");
             userString = "Please log in";
             loginString = "Login";
+            drawerMenu.findItem(R.id.nav_create_account).setVisible(true);
         }
         TextView dit = (TextView) findViewById(R.id.drawerIDText);
         if (dit != null) {
@@ -255,6 +268,10 @@ public class MainActivity extends AppCompatActivity
         if (logMenu != null) {
             logMenu.setTitle(loginString);
             logMenu.setTitleCondensed(loginString);
+        }
+
+        if (userName == null){
+            drawerMenu.findItem(R.id.nav_log_out).setVisible(false);
         }
     }
 }
