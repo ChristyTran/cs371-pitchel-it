@@ -6,6 +6,15 @@
     android:background="@android:color/black"
     android:focusableInTouchMode="true">
 
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:layout_alignTop="@+id/search_bar"
+        android:layout_toEndOf="@+id/search_bar"
+        android:id="@id/search_button"/>
+
     <TextView
         android:paddingTop="10dp"
         android:layout_width="wrap_content"
@@ -32,23 +41,35 @@
         android:inputType="text"
         android:layout_marginLeft="10dp"/>
 
-    <android.support.v7.widget.RecyclerView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/recycler_view"
-        android:paddingTop="25dp"
-        android:layout_below="@+id/search_bar"
-        android:layout_centerHorizontal="true">
+        android:layout_below="@+id/search_bar">
 
-    </android.support.v7.widget.RecyclerView>
-
-    <Button
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit"
-        android:layout_alignTop="@+id/search_bar"
-        android:layout_toEndOf="@+id/search_bar"
-        android:id="@id/search_button"/>
+        android:orientation="vertical">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/recycler_view"
+            android:paddingTop="25dp"
+            android:layout_centerHorizontal="true">
 
+        </android.support.v7.widget.RecyclerView>
+
+        <fragment
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_height="600dp"
+            android:layout_width="match_parent"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/map"
+            android:layout_below="@id/recycler_view"
+            tools:context=".GalleryActivity" />
+
+    </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

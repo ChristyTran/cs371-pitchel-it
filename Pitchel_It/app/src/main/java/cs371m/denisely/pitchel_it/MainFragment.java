@@ -16,12 +16,18 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
@@ -50,7 +56,6 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
     final int REQUEST_READWRITE_STORAGE = 1;
 
-
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
     File newDestination;
     File[] listFiles;
@@ -59,6 +64,10 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     private RecyclerView carousel;
     CarouselAdapter carouselAdapter;
     ArrayList<File> carouselFiles;
+
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    DatabaseReference dbname;
 
     @Nullable
     @Override
@@ -135,6 +144,9 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             carousel.setLayoutManager(layoutManager);
             carousel.setAdapter(carouselAdapter);
         }
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
     }
 
     public File getNewDestination(){
@@ -211,6 +223,20 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             updateCarouselFiles();
             //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
+
+            // TODO: add to firebase
+            String userName = user.getEmail().replaceAll("\\.", "@");
+
+            dbname = FirebaseDatabase.getInstance().getReference(userName);
+
+            PhotoObject photo = new PhotoObject(" ", new LatLng(-34, 151));
+
+            String file_path = data.getData().getPath();
+            String againFUCK = file_path.replace(".", "-");
+            String convertFilePath = againFUCK.replace("/", "*");
+
+            String key = dbname.child(convertFilePath).push().getKey();
+            dbname.child(convertFilePath).setValue(photo);
 
             Intent intent = new Intent(getContext(), OneImage.class);
             intent.putExtra("thumbnail_path", data.getData().getPath());

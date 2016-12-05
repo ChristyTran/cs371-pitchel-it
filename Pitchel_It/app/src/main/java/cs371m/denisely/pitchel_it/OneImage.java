@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.io.File;
 import java.util.Arrays;
@@ -40,6 +41,7 @@ import java.util.List;
 
 public class OneImage extends Activity {
     // FB Sharing help: http://simpledeveloper.com/how-to-share-an-image-on-facebook-in-android/
+    // TODO: change submit tag button to cute icon
 
     ImageView imageView;
     TextView textView;
@@ -150,14 +152,13 @@ public class OneImage extends Activity {
 
                 dbname = FirebaseDatabase.getInstance().getReference(userName);
 
-                PhotoObject photo = new PhotoObject();
-                photo.name = addtag.getText().toString();
-                //userDB = FirebaseDatabase.getInstance().getReference(_userName);
-                //photo.encodedBytes = Base64.encodeToString(data, Base64.DEFAULT);
-                if (dbname != null) {
-                    dbname.child(convertFilePath).push().setValue(photo);
-                }
+                String key = dbname.child(convertFilePath).push().getKey();
+                Log.d("key", key);
 
+                    DatabaseReference ref = dbname.child(convertFilePath);
+                        dbname.child(convertFilePath).child("tag").setValue(addtag.getText().toString());
+
+//                    }
             }
         });
     }
