@@ -11,4 +11,9 @@
 
     <string name="facebook_app_id">371128256565264</string>
 
+    <string name="gallery">Gallery</string>
+    <string name="search_tag">Search for a tag</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="add_a_tag">Add a Tag</string>
+
 </resources>

@@ -2,12 +2,14 @@ package cs371m.denisely.pitchel_it;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.File;
 import java.util.ArrayList;

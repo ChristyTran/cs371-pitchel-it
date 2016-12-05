@@ -5,54 +5,74 @@
     android:layout_height="fill_parent"
     android:background="@color/black">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusableInTouchMode="true">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/one_image"
-        android:adjustViewBounds="true"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="15dp"
-        android:layout_centerHorizontal="true" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/one_image"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="15dp"
+            android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/one_image"
-        android:id="@+id/image_name"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="20dp"
-        android:textColor="@color/white"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/one_image"
+            android:id="@+id/image_name"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/white"/>
 
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share_facebook"
-        android:id="@+id/share_facebook"
-        android:layout_below="@id/image_name"
-        android:layout_centerHorizontal="true" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_facebook"
+            android:id="@+id/share_facebook"
+            android:layout_below="@id/image_name"
+            android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share_instagram"
-        android:id="@+id/share_instagram"
-        android:layout_below="@+id/share_twitter"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_instagram"
+            android:id="@+id/share_instagram"
+            android:layout_below="@+id/share_twitter"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share_twitter"
-        android:id="@+id/share_twitter"
-        android:layout_marginTop="20dp"
-        android:layout_below="@+id/share_facebook"
-        android:layout_centerHorizontal="true" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_twitter"
+            android:id="@+id/share_twitter"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/share_facebook"
+            android:layout_centerHorizontal="true" />
 
-</RelativeLayout>
+        <EditText
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_tag"
+            android:textColorHint="@color/white"
+            android:textColor="@color/white"
+            android:id="@+id/add_tags_text"
+            android:layout_below="@id/share_instagram"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="190dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_a_tag"
+            android:id="@+id/add_tags_button"
+            android:layout_toRightOf="@+id/add_tags_text"
+            android:layout_below="@id/share_instagram"
+            android:layout_marginLeft="15dp"/>
+    </RelativeLayout>
 </ScrollView>
