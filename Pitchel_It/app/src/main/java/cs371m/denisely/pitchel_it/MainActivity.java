@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity
 
     protected ActionBarDrawerToggle toggle;
     protected Menu drawerMenu;
+    protected NavigationView navigationView;
     MainFragment mainFragment;
 
     protected FirebaseAuth mAuth;
@@ -91,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         drawerMenu = navigationView.getMenu();
 
@@ -104,6 +106,7 @@ public class MainActivity extends AppCompatActivity
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 
         ft.commit();
+
     }
 
     public void initializeFacebook(){
@@ -200,11 +203,15 @@ public class MainActivity extends AppCompatActivity
         toggle.setDrawerIndicatorEnabled(true);
 
         updateUserDisplay();
+
+        // Hides the keyboard when returning to MainFragment
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
 
     protected void updateUserDisplay() {
         String loginString = "";
-        String userString = userName;
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             Log.d("Current user:", user.getEmail());
@@ -212,21 +219,24 @@ public class MainActivity extends AppCompatActivity
             loginString = String.format("Logged in as %s", user.getEmail());
             drawerMenu.findItem(R.id.nav_log_out).setVisible(true);
             drawerMenu.findItem(R.id.nav_create_account).setVisible(false);
+            drawerMenu.findItem(R.id.nav_logon).setVisible(false);
+
         } else {
             Log.d("Current user?", "No current user");
-            userString = "Please log in";
-            loginString = "Login";
+            loginString = "Please log in";
+            drawerMenu.findItem(R.id.nav_logon).setVisible(true);
             drawerMenu.findItem(R.id.nav_create_account).setVisible(true);
         }
-        TextView dit = (TextView) findViewById(R.id.drawerIDText);
-        if (dit != null) {
-            dit.setText(userString);
-        }
-        // findViewById does not work for menu items.
-        MenuItem logMenu = (MenuItem) drawerMenu.findItem(R.id.nav_logon);
-        if (logMenu != null) {
-            logMenu.setTitle(loginString);
-            logMenu.setTitleCondensed(loginString);
+
+        // Need to initialize the header of the drawer.
+        // Otherwise, can't find the header items on start up.
+        View header = navigationView.getHeaderView(0);
+        TextView dit = (TextView) header.findViewById(R.id.drawerIDText);
+        if (dit != null) { // For some reason, this is always null on app start up
+            Log.d("dit", "" + loginString);
+            dit.setText(loginString);
+        } else {
+            Log.d("dit", "is null");
         }
 
         if (userName == null){

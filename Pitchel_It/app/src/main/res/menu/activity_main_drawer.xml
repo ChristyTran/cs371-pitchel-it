@@ -6,7 +6,7 @@
         <menu>
             <item android:id="@+id/nav_logon"
                 android:icon="@android:drawable/ic_menu_share"
-                android:title="Log on" />
+                android:title="Log in" />
             <item android:id="@+id/nav_log_out"
                 android:icon="@android:drawable/ic_delete"
                 android:title="Log out" />
