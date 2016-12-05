@@ -28,9 +28,12 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.Arrays;
@@ -51,6 +54,10 @@ public class OneImage extends Activity {
     FirebaseUser user;
     DatabaseReference dbname;
 
+    String convertFilePath;
+    String userName;
+
+
     public void onCreate(Bundle savedInstancestate) {
         super.onCreate(savedInstancestate);
         setContentView(R.layout.one_image);
@@ -66,6 +73,8 @@ public class OneImage extends Activity {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        userName = user.getEmail().replaceAll("\\.", "@");
+        dbname = FirebaseDatabase.getInstance().getReference(userName);
 
         // If user is not logged in, hide the tag box
         if(user == null){
@@ -85,10 +94,26 @@ public class OneImage extends Activity {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
 
-//        Query query = dbname.child("photos").orderByChild("tag");
-//
-//        if (query != null)
-//            textTag.setText(query.toString());
+        String againFUCK = file_path.replace(".", "-");
+        convertFilePath = againFUCK.replace("/", "*");
+
+        dbname.child(convertFilePath).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String tag = (String) dataSnapshot.child("tag").getValue();
+
+                if (tag.equals("")){
+                    textTag.setText("Tag: No tag set");
+                } else {
+                    textTag.setText("Tag: " + tag);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         // Listener for share on Facebook Button
@@ -159,12 +184,7 @@ public class OneImage extends Activity {
             @Override
             public void onClick(View v) {
                 // Remove periods from user name and get reference in database
-                String userName = user.getEmail().replaceAll("\\.", "@");
-                dbname = FirebaseDatabase.getInstance().getReference(userName);
-
                 // Remove periods and back slashes from file path
-                String againFUCK = file_path.replace(".", "-");
-                String convertFilePath = againFUCK.replace("/", "*");
                 String key = dbname.child(convertFilePath).push().getKey();
 
                 // Add tag to database and set text with tag

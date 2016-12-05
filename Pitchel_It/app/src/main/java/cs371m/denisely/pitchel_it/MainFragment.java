@@ -229,7 +229,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             dbname = FirebaseDatabase.getInstance().getReference(userName);
 
-            PhotoObject photo = new PhotoObject(" ", new LatLng(-34, 151));
+            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
 
             String file_path = data.getData().getPath();
             String againFUCK = file_path.replace(".", "-");
