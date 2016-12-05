@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,8 @@ import android.widget.Button;
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -43,7 +46,11 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     final int PICK_IMAGE = 100;
     final int EDIT_IMAGE_SUCCESS = 200;
     final int TAKE_PHOTO = 300;
+    final int EDIT_AFTER_IMPORT_SUCCESS = 400;
+
     final int REQUEST_READWRITE_STORAGE = 1;
+    protected DatabaseReference userDB;
+
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
     File newDestination;
@@ -177,7 +184,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             }
 
             newDestination = getNewDestination();
-            startEditActivity(data.getData(), newDestination);
+            startEditActivity(data.getData(), newDestination, true);
 
         } else if (requestCode == TAKE_PHOTO ){ // && resultCode == RESULT_OK && data != null
             Log.d("take photo result", "newDestination in TAKE_PHOTO result is: " + newDestination.toString());
@@ -198,17 +205,33 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
                 isDirectory = true;
             }
 
-            startEditActivity(Uri.fromFile(newDestination), newDestination);
+            startEditActivity(Uri.fromFile(newDestination), newDestination, false);
 
         } else if (requestCode == EDIT_IMAGE_SUCCESS && resultCode == RESULT_OK && data != null){
             Log.d("edit image success", "Edit image success.");
             updateCarouselFiles();
             //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
+
+            Intent intent = new Intent(getContext(), OneImage.class);
+            intent.putExtra("thumbnail_path", data.getData().getPath());
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+        } else if (requestCode == EDIT_AFTER_IMPORT_SUCCESS){
+            Log.d("edit image success", "Import Edit image success.");
+            updateCarouselFiles();
+            //Update the carousel with new image
+            carousel.getAdapter().notifyDataSetChanged();
+
+            // TODO: Fix bug of the image not showing up after import photo
+            Intent intent = new Intent(getContext(), OneImage.class);
+            intent.putExtra("thumbnail_path", data.getData().getPath());
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
         }
     }
 
-    public void startEditActivity(Uri data, File newDest){
+    public void startEditActivity(Uri data, File newDest, Boolean import_photo){
         Intent imageEditorIntent = new AdobeImageIntent.Builder(myRootView.getContext())
                 .setData(data)
                 .withOutput(newDest)
@@ -217,14 +240,28 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
                 .withOutputQuality(90) // output quality.. idk what this int means
                 .build();
 
-        startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+        if(import_photo)
+            startActivityForResult(imageEditorIntent, EDIT_AFTER_IMPORT_SUCCESS);
+        else
+            startActivityForResult(imageEditorIntent, EDIT_IMAGE_SUCCESS);
+
     }
 
     @Override
     public void onCarouselItemClicked(File picture) {
         // Start new OneImage Activity
         newDestination = getNewDestination();
-        startEditActivity(Uri.fromFile(picture), newDestination);
+        startEditActivity(Uri.fromFile(picture), newDestination, false);
 
     }
+
+//    public void uploadPhoto(){
+//        PhotoObject photo = new PhotoObject();
+//        photo.name = "Name";
+//        userDB = FirebaseDatabase.getInstance().getReference(_userName);
+//        //photo.encodedBytes = Base64.encodeToString(data, Base64.DEFAULT);
+//        if (userDB != null) {
+//            userDB.child("photos").push().setValue(photo);
+//        }
+//    }
 }
