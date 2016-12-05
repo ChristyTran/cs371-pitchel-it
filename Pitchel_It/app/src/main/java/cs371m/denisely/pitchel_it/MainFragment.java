@@ -49,7 +49,6 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     final int EDIT_AFTER_IMPORT_SUCCESS = 400;
 
     final int REQUEST_READWRITE_STORAGE = 1;
-    protected DatabaseReference userDB;
 
 
     File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
@@ -207,7 +206,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             startEditActivity(Uri.fromFile(newDestination), newDestination, false);
 
-        } else if (requestCode == EDIT_IMAGE_SUCCESS && resultCode == RESULT_OK && data != null){
+        } else if (requestCode == EDIT_IMAGE_SUCCESS && resultCode == RESULT_OK && data != null) {
             Log.d("edit image success", "Edit image success.");
             updateCarouselFiles();
             //Update the carousel with new image
@@ -217,18 +216,19 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             intent.putExtra("thumbnail_path", data.getData().getPath());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(intent);
-        } else if (requestCode == EDIT_AFTER_IMPORT_SUCCESS){
-            Log.d("edit image success", "Import Edit image success.");
-            updateCarouselFiles();
-            //Update the carousel with new image
-            carousel.getAdapter().notifyDataSetChanged();
-
-            // TODO: Fix bug of the image not showing up after import photo
-            Intent intent = new Intent(getContext(), OneImage.class);
-            intent.putExtra("thumbnail_path", data.getData().getPath());
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getContext().startActivity(intent);
         }
+//        } else if (requestCode == EDIT_AFTER_IMPORT_SUCCESS){
+//            Log.d("edit image success", "Import Edit image success.");
+//            updateCarouselFiles();
+//            //Update the carousel with new image
+//            carousel.getAdapter().notifyDataSetChanged();
+//
+//            // TODO: Fix bug of the image not showing up after import photo
+//            Intent intent = new Intent(getContext(), OneImage.class);
+//            intent.putExtra("thumbnail_path", data.getData().getPath());
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            getContext().startActivity(intent);
+//        }
     }
 
     public void startEditActivity(Uri data, File newDest, Boolean import_photo){
@@ -254,14 +254,4 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         startEditActivity(Uri.fromFile(picture), newDestination, false);
 
     }
-
-//    public void uploadPhoto(){
-//        PhotoObject photo = new PhotoObject();
-//        photo.name = "Name";
-//        userDB = FirebaseDatabase.getInstance().getReference(_userName);
-//        //photo.encodedBytes = Base64.encodeToString(data, Base64.DEFAULT);
-//        if (userDB != null) {
-//            userDB.child("photos").push().setValue(photo);
-//        }
-//    }
 }

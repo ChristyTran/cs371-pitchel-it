@@ -79,7 +79,6 @@ public class LoginFragment extends Fragment {
                 String password = passwordView.getText().toString().trim();
 
                 // TODO: Validate username, pw
-
                 final ProgressDialog dlg = new ProgressDialog(getActivity());
                 dlg.setMessage("Logging in. Please wait.");
                 dlg.show();
@@ -91,7 +90,9 @@ public class LoginFragment extends Fragment {
                                 Log.d(TAG, "Sign in complete!!!:" + task.isSuccessful());
 
                                 if (!task.isSuccessful()) {
-                                    Log.w(TAG, "Sing in failed!!!!! " + task.getException().getMessage());
+                                    Log.w(TAG, "Sign in failed!!!!! " + task.getException().getMessage());
+                                    // TODO: Put error messages when failed to log in
+
                                     Snackbar.make(myRootView,
                                             "Authentication failed: " + task.getException().getMessage(),
                                             Snackbar.LENGTH_LONG)

@@ -1,16 +1,17 @@
 package cs371m.denisely.pitchel_it;
 
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -21,8 +22,9 @@ import java.util.ArrayList;
 public class GalleryActivity extends Activity {
 
     File[] listFile;
-
     RecyclerView recyclerView;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
 
     public void onCreate(Bundle savedInstancestate){
         super.onCreate(savedInstancestate);
@@ -37,6 +39,16 @@ public class GalleryActivity extends Activity {
 
         GalleryAdapter galleryAdapter = new GalleryAdapter(listFile, getApplicationContext());
         recyclerView.setAdapter(galleryAdapter);
+
+        EditText searchbar = (EditText)findViewById(R.id.search_bar);
+        Button button = (Button)findViewById(R.id.search_button);
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        if(user == null){
+            searchbar.setVisibility(View.GONE);
+            button.setVisibility(View.GONE);
+        }
     }
 
     public void fetchImages(){
