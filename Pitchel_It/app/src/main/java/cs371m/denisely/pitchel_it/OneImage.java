@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -43,14 +44,6 @@ public class OneImage extends Activity {
     // FB Sharing help: http://simpledeveloper.com/how-to-share-an-image-on-facebook-in-android/
     // TODO: change submit tag button to cute icon
 
-    ImageView imageView;
-    TextView textView;
-    EditText addtag;
-    Button share_fb;
-    Button share_twitter;
-    Button share_ig;
-    Button submit_tag;
-    String convertFilePath;
 
     private CallbackManager callbackManager;
     private LoginManager loginManager;
@@ -62,35 +55,43 @@ public class OneImage extends Activity {
         super.onCreate(savedInstancestate);
         setContentView(R.layout.one_image);
 
-        imageView = (ImageView) findViewById(R.id.one_image);
-        textView = (TextView)findViewById(R.id.image_name);
-        share_fb = (Button)findViewById(R.id.share_facebook);
-        share_twitter = (Button)findViewById(R.id.share_twitter);
-        share_ig = (Button)findViewById(R.id.share_instagram);
-        addtag = (EditText) findViewById(R.id.add_tags_text);
-        submit_tag = (Button) findViewById(R.id.add_tags_button);
+        ImageView imageView = (ImageView) findViewById(R.id.one_image);
+        TextView textView = (TextView)findViewById(R.id.image_name);
+        TextView textTag = (TextView)findViewById(R.id.tag_text) ;
+        Button share_fb = (Button)findViewById(R.id.share_facebook);
+        Button share_twitter = (Button)findViewById(R.id.share_twitter);
+        Button share_ig = (Button)findViewById(R.id.share_instagram);
+        Button submit_tag = (Button) findViewById(R.id.add_tags_button);
+        EditText addtag = (EditText) findViewById(R.id.add_tags_text);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+
+        // If user is not logged in, hide the tag box
         if(user == null){
             addtag.setVisibility(View.GONE);
             submit_tag.setVisibility(View.GONE);
         }
 
-        String againFUCK;
+        // Get file path from extras in intent
         Intent intent = getIntent();
         String file_path = intent.getStringExtra("thumbnail_path");
-        againFUCK = file_path.replace(".", "-");
-        convertFilePath = againFUCK.replace("/", "*");
 
         Bitmap bitmap = BitmapFactory.decodeFile(file_path);
         imageView.setImageBitmap(bitmap);
         textView.setText(file_path.toString());
 
-
+        // Hide keyboard for edit text initially
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
 
+//        Query query = dbname.child("photos").orderByChild("tag");
+//
+//        if (query != null)
+//            textTag.setText(query.toString());
+
+
+        // Listener for share on Facebook Button
         share_fb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,17 +124,26 @@ public class OneImage extends Activity {
             }
         });
 
+        // Listener for share on Twitter button
         share_twitter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (verifyAppInstalled("Twitter")){
+                    Intent twitterShareIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    twitterShareIntent.setType("image/*");
+                    Uri imageUri = Uri.fromFile(new File(file_path));
+                    twitterShareIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+                    twitterShareIntent.setPackage("com.twitter.android");
+                    startActivity(twitterShareIntent);
+                }
             }
         });
 
+        // Listener for share on Instagram button
         share_ig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (verificaInstagram()){
+                if (verifyAppInstalled("Instagram")){
                     Intent igShareIntent = new Intent(android.content.Intent.ACTION_SEND);
                     igShareIntent.setType("image/*");
                     Uri imageUri = Uri.fromFile(new File(file_path));
@@ -144,21 +154,27 @@ public class OneImage extends Activity {
             }
         });
 
+        // Listener for submit tag to database button
         submit_tag.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                String tag = addtag.getText().toString();
+                // Remove periods from user name and get reference in database
                 String userName = user.getEmail().replaceAll("\\.", "@");
-
                 dbname = FirebaseDatabase.getInstance().getReference(userName);
 
+                // Remove periods and back slashes from file path
+                String againFUCK = file_path.replace(".", "-");
+                String convertFilePath = againFUCK.replace("/", "*");
                 String key = dbname.child(convertFilePath).push().getKey();
-                Log.d("key", key);
 
-                    DatabaseReference ref = dbname.child(convertFilePath);
-                        dbname.child(convertFilePath).child("tag").setValue(addtag.getText().toString());
+                // Add tag to database and set text with tag
+                String tag = addtag.getText().toString();
+                dbname.child(convertFilePath).child("tag").setValue(tag);
+                textTag.setText("Tag: " + tag);
 
-//                    }
+                // Hide keyboard after submitting
+                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
             }
         });
     }
@@ -182,18 +198,32 @@ public class OneImage extends Activity {
         callbackManager.onActivityResult(requestCode, responseCode, data);
     }
 
-    private boolean verificaInstagram(){
-        boolean installed = false;
+    // Verify that Instagram or Twitter is installed
+    private boolean verifyAppInstalled(String type){
 
-        try {
-            ApplicationInfo info = getPackageManager().getApplicationInfo("com.instagram.android", 0);
-            installed = true;
-            Log.d("Instagram", "Instagram is installed");
-        } catch (PackageManager.NameNotFoundException e) {
-            installed = false;
-            Log.d("Instagram", "Instagram is NOT installed");
-//            Toast.makeText(OneImage.this, "Instagram is not installed!", Toast.LENGTH_SHORT);
+        switch (type) {
+            case "Instagram":
+                try {
+                    ApplicationInfo info = getPackageManager().getApplicationInfo("com.instagram.android", 0);
+                    Log.d("Instagram", "Instagram is installed");
+                    return true;
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d("Instagram", "Instagram is NOT installed");
+                    Toast.makeText(OneImage.this, "Instagram is not installed!", Toast.LENGTH_SHORT);
+                    return false;
+                }
+
+            case "Twitter":
+                try {
+                    ApplicationInfo info = getPackageManager().getApplicationInfo("com.twitter.android", 0);
+                    Log.d("Twitter", "Twitter is installed");
+                    return true;
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d("Twitter", "Twitter is NOT installed");
+                    Toast.makeText(OneImage.this, "Twitter is not installed!", Toast.LENGTH_SHORT);
+                    return false;
+                }
         }
-        return installed;
+        return false;
     }
 }
