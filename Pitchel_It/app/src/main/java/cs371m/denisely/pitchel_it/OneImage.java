@@ -94,7 +94,7 @@ public class OneImage extends Activity {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
 
-        String againFUCK = file_path.replace(".", "-");
+        String againFUCK = file_path.replace(".", "@");
         convertFilePath = againFUCK.replace("/", "*");
 
         dbname.child(convertFilePath).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,7 +102,7 @@ public class OneImage extends Activity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String tag = (String) dataSnapshot.child("tag").getValue();
 
-                if (tag.equals("")){
+                if (tag == null || tag.equals("")){
                     textTag.setText("Tag: No tag set");
                 } else {
                     textTag.setText("Tag: " + tag);

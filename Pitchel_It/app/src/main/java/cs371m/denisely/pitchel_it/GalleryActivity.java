@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Gallery;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +39,9 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class GalleryActivity extends FragmentActivity implements OnMapReadyCallback {
+    public interface searchByTagListener {
+        void searchByTagCallback(File[] files);
+    }
     // TODO: change submit button to cute icon
 
     File[] listFile;
@@ -66,29 +70,32 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
         EditText searchbar = (EditText)findViewById(R.id.search_bar);
         Button button = (Button)findViewById(R.id.search_button);
 
-//        // Remove periods from user name and get reference in database
-//        String userName = user.getEmail().replaceAll("\\.", "@");
-//        dbname = FirebaseDatabase.getInstance().getReference(userName);
-
-        searchbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String tag_to_search = searchbar.getText().toString();
-//                searchForTag(tag_to_search);
-
-                // TODO: do a query for tags
-                // Hide keyboard after submitting
-                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-            }
-        });
-
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         if(user == null){
             searchbar.setVisibility(View.GONE);
             button.setVisibility(View.GONE);
         }
+
+//        // Remove periods from user name and get reference in database
+        String userName = user.getEmail().replaceAll("\\.", "@");
+        dbname = FirebaseDatabase.getInstance().getReference(userName);
+
+        searchByTagListener listener;
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String tag_to_search = searchbar.getText().toString();
+                searchByTag(tag_to_search);
+
+                // TODO: do a query for tags
+                // Hide keyboard after submitting
+                InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+
+            }
+        });
 
 
     }
@@ -101,22 +108,47 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
         }
     }
 
+    public void searchByTag(final String search) {
+        if (dbname == null) {
+            Log.d("TAG", "userDB is null!");
+            return;
+        }
 
-//    public void searchForTag(final String tag) {
-//        if (dbname == null) {
-//            Log.d("Tag", "userDB is null!");
-//            return;
-//        }
-//
-//        dbname.child("photo").orderByChild("tag").addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
-//                PhotoObject photo = dataSnapshot.getValue(PhotoObject.class);
-//                System.out.println(dataSnapshot.getKey() + " has tag: " + photo.tag);
-//            }
-//        });
-//
-//    }
+        Query query = dbname
+                .orderByChild("tag").equalTo(search);
+        query.addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        List<PhotoObject> l = new ArrayList<PhotoObject>();
+                        List<File> filesArrayList = new ArrayList<File>();
+                        for (DataSnapshot photoSnapshot : dataSnapshot.getChildren()) {
+                            //Getting the data from snapshot
+//                            PhotoObject photo = new PhotoObject((String) photoSnapshot.child("tag").getValue(),
+//                                    new LatLng(-34, 151));
+
+                            System.out.println("GalleryActivity "+photoSnapshot.getKey());
+//                                    (File) photoSnapshot.child("filepath").getValue());
+
+                            String againFUCK = photoSnapshot.getKey().replace("@", ".");
+                            String convertFilePath = againFUCK.replace("*", "/");
+
+                            System.out.println("GalleryActivity " + convertFilePath);
+
+                            filesArrayList.add(new File(convertFilePath));
+                        }
+                        File[] files = filesArrayList.toArray(new File[filesArrayList.size()]);
+
+                        GalleryAdapter galleryAdapter = new GalleryAdapter(files, getApplicationContext());
+                        recyclerView.setAdapter(galleryAdapter);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError firebaseError) {
+//                        Log.d(TAG, "Name query cancelled");
+                    }
+                });
+
+    }
 
 
     @Override

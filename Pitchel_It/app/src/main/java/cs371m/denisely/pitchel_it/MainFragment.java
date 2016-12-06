@@ -229,11 +229,16 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             dbname = FirebaseDatabase.getInstance().getReference(userName);
 
+            System.out.println("MainFragment" + data.getData().getPath());
+            String file_path = data.getData().getPath();
+            String againFUCK = file_path.replace(".", "@");
+            String convertFilePath = againFUCK.replace("/", "*");
+            System.out.println("MainFragment" + convertFilePath);
+
+
+//            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151), new File(convertFilePath));
             PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
 
-            String file_path = data.getData().getPath();
-            String againFUCK = file_path.replace(".", "-");
-            String convertFilePath = againFUCK.replace("/", "*");
 
             String key = dbname.child(convertFilePath).push().getKey();
             dbname.child(convertFilePath).setValue(photo);
