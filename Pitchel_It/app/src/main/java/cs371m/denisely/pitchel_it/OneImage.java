@@ -97,8 +97,8 @@ public class OneImage extends Activity {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
 
-        String againFUCK = file_path.replace(".", "@");
-        convertFilePath = againFUCK.replace("/", "*");
+        String tempstring = file_path.replace(".", "@");
+        convertFilePath = tempstring.replace("/", "*");
 
         if (user != null) {
             DatabaseReference temp = dbname.child(convertFilePath);

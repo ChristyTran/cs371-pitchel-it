@@ -18,13 +18,16 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit"
-        android:layout_alignParentRight="true"
+    <ImageButton
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/search_button"
+        android:scaleType="fitXY"
+        android:background="@color/black"
         android:layout_alignTop="@+id/search_bar"
+        android:layout_alignParentRight="true"
         android:id="@+id/search_gallery_button"/>
+    />
 
     <EditText
         android:layout_width="500dp"
@@ -37,7 +40,8 @@
         android:layout_marginTop="22dp"
         android:textColor="@color/white"
         android:maxLines="1"
-        android:inputType="text"/>
+        android:inputType="text"
+        style="@style/Widget.AppCompat.EditText"/>
 
     <ScrollView
         android:layout_width="match_parent"

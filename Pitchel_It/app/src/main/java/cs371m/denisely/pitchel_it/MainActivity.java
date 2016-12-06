@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,10 +31,18 @@ import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 
 import static android.os.Environment.getExternalStorageState;
 
@@ -51,6 +60,10 @@ public class MainActivity extends AppCompatActivity
     protected FirebaseAuth mAuth;
     protected FirebaseAuth.AuthStateListener mAuthListener;
     protected String userName;
+    DatabaseReference dbname;
+
+
+    File destination = new File(Environment.getExternalStorageDirectory(), "Pictures" + File.separator + "Pitchel It/");
 
     protected void firebaseInit() {
         mAuth = FirebaseAuth.getInstance();
@@ -205,6 +218,37 @@ public class MainActivity extends AppCompatActivity
         toggle.setDrawerIndicatorEnabled(true);
 
         updateUserDisplay();
+
+        // Sync with firebase incase you deleted stuff while logged off
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (destination.isDirectory() && user != null){
+            File[] listFile = destination.listFiles();
+            userName = user.getEmail().replaceAll("\\.", "@");
+            dbname = FirebaseDatabase.getInstance().getReference(userName);
+            if (listFile != null && listFile.length > 0){
+                dbname.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot photoSnapshot : dataSnapshot.getChildren()) {
+                            //Getting the data from snapshot
+                            String tempstring = photoSnapshot.getKey().replace("@", ".");
+                            String convertFilePath = tempstring.replace("*", "/");
+                            File file = new File(convertFilePath);
+                            if(!file.exists()){
+                                dbname.child(photoSnapshot.getKey()).removeValue();
+                                Log.d("Firebase Sync", "removed from firebase a photo that was no longer on device");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+        }
 
         // Hides the keyboard when returning to MainFragment
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

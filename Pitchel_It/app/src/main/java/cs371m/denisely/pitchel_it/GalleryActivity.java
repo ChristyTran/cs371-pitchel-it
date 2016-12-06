@@ -1,6 +1,5 @@
 package cs371m.denisely.pitchel_it;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,8 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
+import android.widget.ImageButton;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,7 +38,8 @@ import com.google.firebase.database.ValueEventListener;
  * Created by Denise on 11/6/2016.
  */
 
-public class GalleryActivity extends FragmentActivity implements OnMapReadyCallback {
+public class GalleryActivity extends FragmentActivity implements OnMapReadyCallback,
+    GalleryAdapter.TriggerMapUpdate {
     // TODO: change submit button to cute icon
 
     File[] listFile;
@@ -48,6 +47,7 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
     FirebaseAuth mAuth;
     FirebaseUser user;
     DatabaseReference dbname;
+    GalleryAdapter.TriggerMapUpdate triggerMapUpdate;
 
     private GoogleMap mMap;
 
@@ -64,17 +64,19 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
         GalleryAdapter galleryAdapter = new GalleryAdapter(listFile, getApplicationContext());
+        galleryAdapter.setUpdateMapListener(this);
         recyclerView.setAdapter(galleryAdapter);
 
         EditText searchbar = (EditText)findViewById(R.id.search_bar);
-        Button button = (Button)findViewById(R.id.search_gallery_button);
+//        Button button = (Button)findViewById(R.id.search_gallery_button);
+        ImageButton button = (ImageButton) findViewById(R.id.search_gallery_button);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         String userName = "";
         if(user == null){
             searchbar.setVisibility(View.GONE);
-            button.setVisibility(View.GONE);
+            button.setVisibility(View.INVISIBLE);
             mapFragment.getView().setVisibility(View.INVISIBLE);
         } else {
             userName = user.getEmail().replaceAll("\\.", "@");
@@ -122,14 +124,15 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
                         List<File> filesArrayList = new ArrayList<File>();
                         for (DataSnapshot photoSnapshot : dataSnapshot.getChildren()) {
                             //Getting the data from snapshot
-                            String againFUCK = photoSnapshot.getKey().replace("@", ".");
-                            String convertFilePath = againFUCK.replace("*", "/");
+                            String tempstring = photoSnapshot.getKey().replace("@", ".");
+                            String convertFilePath = tempstring.replace("*", "/");
 
                             filesArrayList.add(new File(convertFilePath));
                         }
                         File[] files = filesArrayList.toArray(new File[filesArrayList.size()]);
 
                         GalleryAdapter galleryAdapter = new GalleryAdapter(files, getApplicationContext());
+                        galleryAdapter.setUpdateMapListener(GalleryActivity.this);
                         recyclerView.setAdapter(galleryAdapter);
                     }
                     @Override
@@ -182,8 +185,13 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
                             Log.d("onCancelled", "Name query cancelled");
                         }
                     });
-
-
         }
+    }
+
+    @Override
+    public void updateMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 }

@@ -26,20 +26,16 @@ import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 
 import com.adobe.creativesdk.aviary.AdobeImageIntent;
 import com.adobe.creativesdk.aviary.internal.headless.utils.MegaPixels;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -181,6 +177,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         listFiles = destination.listFiles();
         File[] result = new File[]{};
         if (listFiles != null && listFiles.length > 0){
+            Log.d("listFiles length", ""+listFiles.length);
             if (listFiles.length < 6){
                 result = Arrays.copyOfRange(listFiles, 0, listFiles.length);
             } else {
@@ -255,7 +252,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             updateCarouselFiles();
             //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
-            
+
             addPhotoToFirebase(newDestination.toString());
 
             Intent intent = new Intent(getContext(), OneImage.class);
@@ -276,8 +273,8 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             dbname = FirebaseDatabase.getInstance().getReference(userName);
 
-            String againFUCK = filePath.replace(".", "@");
-            String convertFilePath = againFUCK.replace("/", "*");
+            String temp = filePath.replace(".", "@");
+            String convertFilePath = temp.replace("/", "*");
             System.out.println("MainFragment" + convertFilePath);
 
             PhotoObject photo;
@@ -291,6 +288,8 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
             String key = dbname.child(convertFilePath).push().getKey();
             dbname.child(convertFilePath).setValue(photo);
+
+
         } else {
             Log.d("User", "not logged in");
         }
@@ -351,7 +350,6 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 //            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
 //            System.out.println("Latitude: " + String.valueOf(mLastLocation.getLatitude()));
 //            System.out.println(String.valueOf(mLastLocation.getLongitude()));
-
         } else {
             Log.d("onConnected", "null last location");
         }
@@ -368,4 +366,20 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         Log.d("onConnectionFailed", "was reached");
 
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.d("MainFragment", "onResume");
+        if (destination.isDirectory()) {
+            carouselFiles = getCarouselFiles();
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            carouselAdapter = new CarouselAdapter(carouselFiles);
+            carouselAdapter.setCarouselClickListener(this);
+            carousel.setLayoutManager(layoutManager);
+            carousel.setAdapter(carouselAdapter);
+        }
+    }
+
+    // TODO: update carousel after deleting a photo
 }

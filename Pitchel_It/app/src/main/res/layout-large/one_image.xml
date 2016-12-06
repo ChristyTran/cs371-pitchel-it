@@ -25,6 +25,7 @@
             android:layout_below="@id/one_image"
             android:id="@+id/image_name"
             android:layout_centerHorizontal="true"
+            android:gravity="center"
             android:layout_marginBottom="20dp"
             android:textColor="@color/white"/>
 

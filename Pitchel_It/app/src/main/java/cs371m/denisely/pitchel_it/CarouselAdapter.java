@@ -55,7 +55,12 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
         File picture = listFile.get(position);
-        Bitmap myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(picture.toString()));
+        Bitmap myBitmap;
+        try {
+            myBitmap = GalleryAdapter.scaleBitmapAndKeepRatio(BitmapFactory.decodeFile(picture.toString()));
+        } catch (Exception e){
+            return;
+        }
         holder.thumbnail.setImageBitmap(myBitmap);
 
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +77,6 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.ImageV
             }
         });
     }
-
 
     @Override
     public int getItemCount() {

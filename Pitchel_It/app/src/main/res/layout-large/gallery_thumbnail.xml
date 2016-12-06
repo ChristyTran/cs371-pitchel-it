@@ -9,4 +9,13 @@
         android:id="@+id/thumbnail"
         android:paddingBottom="10dp"/>
 
+    <ImageButton
+        android:id="@+id/delete_from_gallery"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:background="@color/adobe_csdk_transparent_color"
+        android:scaleType="fitXY"
+        android:layout_alignEnd="@+id/thumbnail"
+        android:src="@drawable/pink_x"/>
+
 </RelativeLayout>
