@@ -68,7 +68,7 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
         recyclerView.setAdapter(galleryAdapter);
 
         EditText searchbar = (EditText)findViewById(R.id.search_bar);
-        Button button = (Button)findViewById(R.id.search_button);
+        Button button = (Button)findViewById(R.id.search_gallery_button);
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();

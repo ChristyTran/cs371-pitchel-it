@@ -225,41 +225,63 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             carousel.getAdapter().notifyDataSetChanged();
 
             // TODO: add to firebase
-            String userName = user.getEmail().replaceAll("\\.", "@");
+//            String userName = user.getEmail().replaceAll("\\.", "@");
 
-            dbname = FirebaseDatabase.getInstance().getReference(userName);
+//            dbname = FirebaseDatabase.getInstance().getReference(userName);
+//
+//            System.out.println("MainFragment" + data.getData().getPath());
+//            String file_path = data.getData().getPath();
+//            String againFUCK = file_path.replace(".", "@");
+//            String convertFilePath = againFUCK.replace("/", "*");
+//            System.out.println("MainFragment" + convertFilePath);
+//
+//            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
+//
+//            String key = dbname.child(convertFilePath).push().getKey();
+//            dbname.child(convertFilePath).setValue(photo);
 
-            System.out.println("MainFragment" + data.getData().getPath());
-            String file_path = data.getData().getPath();
-            String againFUCK = file_path.replace(".", "@");
-            String convertFilePath = againFUCK.replace("/", "*");
-            System.out.println("MainFragment" + convertFilePath);
-
-
-//            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151), new File(convertFilePath));
-            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
-
-
-            String key = dbname.child(convertFilePath).push().getKey();
-            dbname.child(convertFilePath).setValue(photo);
+            addPhotoToFirebase(data.getData().getPath());
 
             Intent intent = new Intent(getContext(), OneImage.class);
             intent.putExtra("thumbnail_path", data.getData().getPath());
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(intent);
         }
-//        } else if (requestCode == EDIT_AFTER_IMPORT_SUCCESS){
-//            Log.d("edit image success", "Import Edit image success.");
-//            updateCarouselFiles();
-//            //Update the carousel with new image
-//            carousel.getAdapter().notifyDataSetChanged();
-//
-//            // TODO: Fix bug of the image not showing up after import photo
-//            Intent intent = new Intent(getContext(), OneImage.class);
-//            intent.putExtra("thumbnail_path", data.getData().getPath());
-//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            getContext().startActivity(intent);
-//        }
+         else if (requestCode == EDIT_AFTER_IMPORT_SUCCESS){
+            Log.d("edit image success", "Import Edit image success.");
+            updateCarouselFiles();
+            //Update the carousel with new image
+            carousel.getAdapter().notifyDataSetChanged();
+
+            // TODO: Fix bug of the image not showing up after import photo
+
+            addPhotoToFirebase(newDestination.toString());
+
+            Intent intent = new Intent(getContext(), OneImage.class);
+            if (newDestination != null) {
+                Log.d("newDes -> oneImage", newDestination.toString());
+            }
+            intent.putExtra("thumbnail_path", newDestination);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+        }
+    }
+
+    public void addPhotoToFirebase(String filePath){
+        String userName = user.getEmail().replaceAll("\\.", "@");
+
+        dbname = FirebaseDatabase.getInstance().getReference(userName);
+
+//        System.out.println("MainFragment" + data.getData().getPath());
+//        String file_path = data.getData().getPath();
+        String againFUCK = filePath.replace(".", "@");
+        String convertFilePath = againFUCK.replace("/", "*");
+        System.out.println("MainFragment" + convertFilePath);
+
+        PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
+
+        String key = dbname.child(convertFilePath).push().getKey();
+        dbname.child(convertFilePath).setValue(photo);
     }
 
     public void startEditActivity(Uri data, File newDest, Boolean import_photo){

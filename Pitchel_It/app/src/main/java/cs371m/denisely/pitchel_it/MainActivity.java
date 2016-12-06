@@ -60,9 +60,11 @@ public class MainActivity extends AppCompatActivity
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
+                    Log.d("Logged in?", "Yes, username is " + user.getDisplayName());
                     userName = user.getDisplayName();
                 } else {
                     // User is signed out
+                    Log.d("Logged in?", "no user is null");
                     userName = null;
                 }
                 updateUserDisplay();

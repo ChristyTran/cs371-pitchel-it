@@ -84,11 +84,14 @@ public class OneImage extends Activity {
 
         // Get file path from extras in intent
         Intent intent = getIntent();
-        String file_path = intent.getStringExtra("thumbnail_path");
+//        String file_path = intent.getStringExtra("thumbnail_path").toString();
+        String file_path = intent.getSerializableExtra("thumbnail_path").toString();
 
         Bitmap bitmap = BitmapFactory.decodeFile(file_path);
         imageView.setImageBitmap(bitmap);
-        textView.setText(file_path.toString());
+//        textView.setText(file_path.toString());
+        textView.setText(file_path);
+
 
         // Hide keyboard for edit text initially
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

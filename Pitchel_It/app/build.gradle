@@ -74,5 +74,6 @@ dependencies {
 
     // Google play services
     compile 'com.google.android.gms:play-services:9.6.0'
+//    compile 'com.google.android.gms:play-services:10.0.1'
 }
 apply plugin: 'com.google.gms.google-services'

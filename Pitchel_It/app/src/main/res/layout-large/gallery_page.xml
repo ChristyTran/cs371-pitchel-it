@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:text="Submit"
         android:layout_alignTop="@+id/search_bar"
-        android:layout_toEndOf="@+id/search_bar"
-        android:id="@id/search_button"/>
+        android:layout_alignParentRight="true"
+        android:id="@+id/search_gallery_button"/>
 
     <TextView
         android:paddingTop="10dp"
