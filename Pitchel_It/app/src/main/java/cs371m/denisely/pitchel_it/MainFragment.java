@@ -255,9 +255,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             updateCarouselFiles();
             //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
-
-            // TODO: Fix bug of the image not showing up after import photo
-
+            
             addPhotoToFirebase(newDestination.toString());
 
             Intent intent = new Intent(getContext(), OneImage.class);
@@ -271,12 +269,12 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     }
 
     public void addPhotoToFirebase(String filePath){
+        Log.d("adding file to db", filePath);
         user = mAuth.getCurrentUser();
         if (user != null) {
             String userName = user.getEmail().replaceAll("\\.", "@");
 
             dbname = FirebaseDatabase.getInstance().getReference(userName);
-
 
             String againFUCK = filePath.replace(".", "@");
             String convertFilePath = againFUCK.replace("/", "*");
@@ -318,7 +316,7 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     public void onCarouselItemClicked(File picture) {
         // Start new OneImage Activity
         newDestination = getNewDestination();
-        startEditActivity(Uri.fromFile(picture), newDestination, false);
+        startEditActivity(Uri.fromFile(picture), newDestination, true);
 
     }
 
