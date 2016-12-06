@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Gallery;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.android.gms.maps.SupportMapFragment;
@@ -39,9 +41,6 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class GalleryActivity extends FragmentActivity implements OnMapReadyCallback {
-    public interface searchByTagListener {
-        void searchByTagCallback(File[] files);
-    }
     // TODO: change submit button to cute icon
 
     File[] listFile;
@@ -72,16 +71,19 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        String userName = "";
         if(user == null){
             searchbar.setVisibility(View.GONE);
             button.setVisibility(View.GONE);
+            mapFragment.getView().setVisibility(View.INVISIBLE);
+        } else {
+            userName = user.getEmail().replaceAll("\\.", "@");
+
         }
 
-//        // Remove periods from user name and get reference in database
-        String userName = user.getEmail().replaceAll("\\.", "@");
+        // Remove periods from user name and get reference in database
+//        String userName = user.getEmail().replaceAll("\\.", "@");
         dbname = FirebaseDatabase.getInstance().getReference(userName);
-
-        searchByTagListener listener;
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,15 +91,12 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
                 String tag_to_search = searchbar.getText().toString();
                 searchByTag(tag_to_search);
 
-                // TODO: do a query for tags
                 // Hide keyboard after submitting
                 InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
 
             }
         });
-
-
     }
 
     public void fetchImages(){
@@ -120,20 +119,11 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
                 new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-//                        List<PhotoObject> l = new ArrayList<PhotoObject>();
                         List<File> filesArrayList = new ArrayList<File>();
                         for (DataSnapshot photoSnapshot : dataSnapshot.getChildren()) {
                             //Getting the data from snapshot
-//                            PhotoObject photo = new PhotoObject((String) photoSnapshot.child("tag").getValue(),
-//                                    new LatLng(-34, 151));
-
-                            System.out.println("GalleryActivity "+photoSnapshot.getKey());
-//                                    (File) photoSnapshot.child("filepath").getValue());
-
                             String againFUCK = photoSnapshot.getKey().replace("@", ".");
                             String convertFilePath = againFUCK.replace("*", "/");
-
-                            System.out.println("GalleryActivity " + convertFilePath);
 
                             filesArrayList.add(new File(convertFilePath));
                         }
@@ -144,7 +134,7 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
                     }
                     @Override
                     public void onCancelled(DatabaseError firebaseError) {
-//                        Log.d(TAG, "Name query cancelled");
+                        Log.d("onCancelled", "Name query cancelled");
                     }
                 });
 
@@ -153,13 +143,47 @@ public class GalleryActivity extends FragmentActivity implements OnMapReadyCallb
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        if (user != null) {
+            mMap = googleMap;
+            mMap.clear();
 
-        // TODO: Pin all locations to map. Do a query of all locations.
+            Query query = dbname
+                    .orderByChild("coordinates");
+            if (query == null){
+                Log.d("Query", "is null");
+            } else {
+                Log.d("Query", "is not null");
+            }
+            query.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Log.d("dataSnapshot size", Long.toString(dataSnapshot.getChildrenCount()));
+                            for (DataSnapshot photoSnapshot : dataSnapshot.getChildren()) {
+                                //Getting the data from snapshot
+                                HashMap<String, Object> firebaseObjMap = (HashMap<String,Object>)photoSnapshot.getValue();
+                                HashMap<String, Object> coordinatesObjMap = (HashMap<String,Object>)firebaseObjMap.get("coordinates");
 
-        // Add a marker in Sydney, Australia, and move the camera.
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+                                try {
+                                    LatLng coordinates = new LatLng((double) coordinatesObjMap.get("latitude"), (double) coordinatesObjMap.get("longitude"));
+                                    Log.d("Size of photoSnapShot", Long.toString(photoSnapshot.getChildrenCount()));
+
+                                    Log.d("Latitude in onmapready", Double.toString(coordinates.latitude));
+                                    Log.d("Longitude in onmapready", Double.toString(coordinates.longitude));
+                                    mMap.addMarker(new MarkerOptions().position(coordinates).title("marker"));
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
+                                } catch (Exception e){
+                                    Log.d("coordinatesObjMap", "probably null");
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError firebaseError) {
+                            Log.d("onCancelled", "Name query cancelled");
+                        }
+                    });
+
+
+        }
     }
 }

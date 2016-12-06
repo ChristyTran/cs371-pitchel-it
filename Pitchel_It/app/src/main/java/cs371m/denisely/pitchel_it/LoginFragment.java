@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -93,10 +94,11 @@ public class LoginFragment extends Fragment {
                                     Log.w(TAG, "Sign in failed!!!!! " + task.getException().getMessage());
                                     // TODO: Put error messages when failed to log in
 
-                                    Snackbar.make(myRootView,
-                                            "Authentication failed: " + task.getException().getMessage(),
-                                            Snackbar.LENGTH_LONG)
-                                            .setAction("Action", null).show();
+//                                    Snackbar.make(myRootView,
+//                                            "Authentication failed: " + task.getException().getMessage(),
+//                                            Snackbar.LENGTH_LONG)
+//                                            .setAction("Action", null).show();
+                                    Toast.makeText(getActivity(), "Authentication failed!", Toast.LENGTH_SHORT).show();
                                 } else {
                                     LoginInterface.firebaseLoginFinish();
                                 }

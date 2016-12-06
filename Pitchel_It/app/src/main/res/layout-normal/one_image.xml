@@ -77,7 +77,7 @@
             android:id="@+id/add_tags_text"
             android:layout_below="@id/tag_text"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="190dp"
+            android:layout_marginLeft="80dp"
             android:maxLines="1"/>
 
 

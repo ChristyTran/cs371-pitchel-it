@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * Created by Denise on 11/6/2016.
  */
 
-public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> implements GalleryActivity.searchByTagListener{
+public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder> {
 
     private File[] files;
     public static int maxW = 500;
@@ -89,12 +89,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.GalleryV
             return 0;
         }
         return files.length;
-    }
-
-    @Override
-    public void searchByTagCallback(File[] files) {
-        this.files = files;
-        notifyDataSetChanged();
     }
 
     public class GalleryViewHolder extends RecyclerView.ViewHolder {

@@ -6,11 +6,13 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Location;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,6 +24,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,7 +52,8 @@ import static android.app.Activity.RESULT_OK;
  * Created by Denise on 11/22/2016.
  */
 
-public class MainFragment extends Fragment implements CarouselAdapter.CarouselClickListener{
+public class MainFragment extends Fragment implements CarouselAdapter.CarouselClickListener,
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     protected View myRootView;
 
     final int PICK_IMAGE = 100;
@@ -68,6 +75,8 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     FirebaseAuth mAuth;
     FirebaseUser user;
     DatabaseReference dbname;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     @Nullable
     @Override
@@ -93,6 +102,9 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                             Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_READWRITE_STORAGE);
+
+            // TODO: public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+            // Wait for user to accept all permissions first, then continue w/ the rest of create
         }
 
         Button takePhoto = (Button) v.findViewById(R.id.take_photo);
@@ -147,6 +159,13 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
     }
 
     public File getNewDestination(){
@@ -224,22 +243,6 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
             //Update the carousel with new image
             carousel.getAdapter().notifyDataSetChanged();
 
-            // TODO: add to firebase
-//            String userName = user.getEmail().replaceAll("\\.", "@");
-
-//            dbname = FirebaseDatabase.getInstance().getReference(userName);
-//
-//            System.out.println("MainFragment" + data.getData().getPath());
-//            String file_path = data.getData().getPath();
-//            String againFUCK = file_path.replace(".", "@");
-//            String convertFilePath = againFUCK.replace("/", "*");
-//            System.out.println("MainFragment" + convertFilePath);
-//
-//            PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
-//
-//            String key = dbname.child(convertFilePath).push().getKey();
-//            dbname.child(convertFilePath).setValue(photo);
-
             addPhotoToFirebase(data.getData().getPath());
 
             Intent intent = new Intent(getContext(), OneImage.class);
@@ -268,20 +271,31 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
     }
 
     public void addPhotoToFirebase(String filePath){
-        String userName = user.getEmail().replaceAll("\\.", "@");
+        user = mAuth.getCurrentUser();
+        if (user != null) {
+            String userName = user.getEmail().replaceAll("\\.", "@");
 
-        dbname = FirebaseDatabase.getInstance().getReference(userName);
+            dbname = FirebaseDatabase.getInstance().getReference(userName);
 
-//        System.out.println("MainFragment" + data.getData().getPath());
-//        String file_path = data.getData().getPath();
-        String againFUCK = filePath.replace(".", "@");
-        String convertFilePath = againFUCK.replace("/", "*");
-        System.out.println("MainFragment" + convertFilePath);
 
-        PhotoObject photo = new PhotoObject("", new LatLng(-34, 151));
+            String againFUCK = filePath.replace(".", "@");
+            String convertFilePath = againFUCK.replace("/", "*");
+            System.out.println("MainFragment" + convertFilePath);
 
-        String key = dbname.child(convertFilePath).push().getKey();
-        dbname.child(convertFilePath).setValue(photo);
+            PhotoObject photo;
+            if (mLastLocation != null) {
+                Log.d("Latitude before add", String.valueOf(mLastLocation.getLatitude()));
+                Log.d("Longitude before add", String.valueOf(mLastLocation.getLongitude()));
+                photo = new PhotoObject("", new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            } else {
+                photo = new PhotoObject("", null);
+            }
+
+            String key = dbname.child(convertFilePath).push().getKey();
+            dbname.child(convertFilePath).setValue(photo);
+        } else {
+            Log.d("User", "not logged in");
+        }
     }
 
     public void startEditActivity(Uri data, File newDest, Boolean import_photo){
@@ -305,6 +319,55 @@ public class MainFragment extends Fragment implements CarouselAdapter.CarouselCl
         // Start new OneImage Activity
         newDestination = getNewDestination();
         startEditActivity(Uri.fromFile(picture), newDestination, false);
+
+    }
+
+    @Override
+    public void onStart() {
+        Log.d("onStart", "was reached");
+        super.onStart();
+        int permissionCheck3 = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+        if (permissionCheck3 != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
+        mGoogleApiClient.connect();
+
+    }
+
+    @Override
+    public void onStop() {
+        Log.d("onStop", "was reached");
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Log.d("OnConnected", "was reached");
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+//            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
+//            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
+//            System.out.println("Latitude: " + String.valueOf(mLastLocation.getLatitude()));
+//            System.out.println(String.valueOf(mLastLocation.getLongitude()));
+
+        } else {
+            Log.d("onConnected", "null last location");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d("onConnectionSuspended", "was reached");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("onConnectionFailed", "was reached");
 
     }
 }

@@ -14,8 +14,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.app.Fragment;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -107,14 +109,14 @@ public class CreateAccountFragment extends Fragment {
                                     // Show the error message
                                     Exception e = task.getException();
                                     if (e != null) Log.d(TAG, e.getMessage());
-                                    Snackbar.make(myRootView, "Authentication failed", Snackbar.LENGTH_LONG)
-                                            .setAction("Action", null).show();
+//                                    Snackbar.make(myRootView, "Authentication failed", Snackbar.LENGTH_LONG)
+//                                            .setAction("Action", null).show();
                                 } else {
-//                                    // TODO: update drawer with username after create account
                                     CreateAccountInterface.firebaseLoginFinish();
                                 }
                             }
                         });
+
             }
         });
     }

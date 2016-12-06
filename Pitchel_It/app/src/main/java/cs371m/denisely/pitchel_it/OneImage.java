@@ -73,23 +73,23 @@ public class OneImage extends Activity {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
-        userName = user.getEmail().replaceAll("\\.", "@");
-        dbname = FirebaseDatabase.getInstance().getReference(userName);
 
         // If user is not logged in, hide the tag box
         if(user == null){
             addtag.setVisibility(View.GONE);
             submit_tag.setVisibility(View.GONE);
+            textTag.setVisibility(View.GONE);
+        } else {
+            userName = user.getEmail().replaceAll("\\.", "@");
+            dbname = FirebaseDatabase.getInstance().getReference(userName);
         }
 
         // Get file path from extras in intent
         Intent intent = getIntent();
-//        String file_path = intent.getStringExtra("thumbnail_path").toString();
         String file_path = intent.getSerializableExtra("thumbnail_path").toString();
 
         Bitmap bitmap = BitmapFactory.decodeFile(file_path);
         imageView.setImageBitmap(bitmap);
-//        textView.setText(file_path.toString());
         textView.setText(file_path);
 
 
@@ -100,23 +100,33 @@ public class OneImage extends Activity {
         String againFUCK = file_path.replace(".", "@");
         convertFilePath = againFUCK.replace("/", "*");
 
-        dbname.child(convertFilePath).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String tag = (String) dataSnapshot.child("tag").getValue();
+        if (user != null) {
+            DatabaseReference temp = dbname.child(convertFilePath);
+            if (temp == null){
+                PhotoObject photo = new PhotoObject("", null);
 
-                if (tag == null || tag.equals("")){
-                    textTag.setText("Tag: No tag set");
-                } else {
-                    textTag.setText("Tag: " + tag);
-                }
+                String key = dbname.child(convertFilePath).push().getKey();
+                dbname.child(convertFilePath).setValue(photo);
+            } else {
+                dbname.child(convertFilePath).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String tag = (String) dataSnapshot.child("tag").getValue();
+
+                        if (tag == null || tag.equals("")) {
+                            textTag.setText("Tag: No tag set");
+                        } else {
+                            textTag.setText("Tag: " + tag);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+        }
 
 
         // Listener for share on Facebook Button
